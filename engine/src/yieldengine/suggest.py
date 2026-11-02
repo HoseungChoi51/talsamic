@@ -39,12 +39,13 @@ class RiskLevel:
     rank_by: str  # "quantile" or "ei"
     quantile: float | None
     radius: float  # max distance from the nearest past run (1 = one condition across its whole range)
+    max_new: int | None  # optimize runs per batch that may use a value never run before (None = no limit)
 
 
 RISK_LEVELS = {
-    "안전하게": RiskLevel("안전하게", "quantile", 0.25, 0.15),
-    "균형": RiskLevel("균형", "ei", None, 0.30),
-    "도전적으로": RiskLevel("도전적으로", "quantile", 0.90, 0.60),
+    "안전하게": RiskLevel("안전하게", "quantile", 0.25, 0.15, 0),
+    "균형": RiskLevel("균형", "ei", None, 0.30, 1),
+    "도전적으로": RiskLevel("도전적으로", "quantile", 0.90, 0.60, None),
 }
 
 
@@ -59,6 +60,7 @@ class BatchSettings:
     n_candidates: int = 4000
     min_separation: float = 0.08
     radius: float | None = None  # override the risk level's distance limit (benchmarks)
+    max_new: int | None = None  # override the risk level's limit on optimize runs with a never-run value
     seed: int = 0
 
     def resolved_split(self) -> tuple[int, int, int]:
@@ -193,22 +195,33 @@ def score(pred: Prediction, risk: RiskLevel, incumbent: float) -> np.ndarray:
 
 
 def _pick_diverse(schema, pool: pd.DataFrame, order: np.ndarray, k: int, taken: list[pd.DataFrame],
-                  min_sep: float) -> list[int]:
-    """Greedy by score, skipping near-duplicates. If the constraints leave too little room,
-    the minimum separation is relaxed step by step (exact duplicates are never allowed)."""
+                  min_sep: float, capped: np.ndarray | None = None, cap: int | None = None) -> list[int]:
+    """Greedy by score, skipping near-duplicates, and taking at most ``cap`` rows marked in
+    ``capped``. If the constraints leave too little room, the minimum separation is relaxed
+    step by step, and only then the cap (exact duplicates are never allowed)."""
     ref = pd.concat(taken, ignore_index=True) if taken else None
     chosen: list[int] = []
-    for sep in (min_sep, min_sep / 2, min_sep / 4, 1e-9):
-        for i in order:
-            if len(chosen) >= k:
-                return chosen
-            if i in chosen:
-                continue
-            others = ([ref] if ref is not None else []) + ([pool.iloc[chosen]] if chosen else [])
-            if others and control_distance(schema, pool.iloc[[i]], pd.concat(others, ignore_index=True)).min() < sep:
-                continue
-            chosen.append(int(i))
+    for limit in ([cap, None] if cap is not None and capped is not None else [None]):
+        for sep in (min_sep, min_sep / 2, min_sep / 4, 1e-9):
+            for i in order:
+                if len(chosen) >= k:
+                    return chosen
+                if i in chosen:
+                    continue
+                if limit is not None and capped[i] and int(capped[chosen].sum()) >= limit:
+                    continue
+                others = ([ref] if ref is not None else []) + ([pool.iloc[chosen]] if chosen else [])
+                if others and control_distance(schema, pool.iloc[[i]], pd.concat(others, ignore_index=True)).min() < sep:
+                    continue
+                chosen.append(int(i))
     return chosen
+
+
+def _uses_new_value(pred: Prediction, settings: BatchSettings) -> np.ndarray:
+    """Rows with a never-run value the engineer didn't ask for (fixed conditions don't count)."""
+    if pred.novel is None:
+        return np.zeros(len(pred), bool)
+    return np.array([any(n not in settings.fixed for n in names) for names in pred.novel], bool)
 
 
 def _py(x):
@@ -278,7 +291,13 @@ def suggest_batch(
         inside = dist <= np.quantile(dist, min(1.0, 5 * max(1, n_opt) / len(dist)))
     s = score(pred, risk, incumbent)
     s = np.where(inside, s, -np.inf)
-    opt_idx = _pick_diverse(schema, cands, np.argsort(-s)[: int(inside.sum())], n_opt, [], settings.min_separation)
+    # A never-run value gets a wide range from the new-chemical guard, which pulls 균형 and
+    # 도전적으로 toward it. The risk level limits how many optimize runs may be such guesses;
+    # trying new values is otherwise the learn runs' job.
+    new_value = _uses_new_value(pred, settings)
+    max_new = settings.max_new if settings.max_new is not None else risk.max_new
+    opt_idx = _pick_diverse(schema, cands, np.argsort(-s)[: int(inside.sum())], n_opt, [], settings.min_separation,
+                            new_value, max_new)
 
     suggestions: list[Suggestion] = []
     lo80, hi80 = pred.interval(0.8)
@@ -340,10 +359,15 @@ def suggest_batch(
         add(REFERENCE, recipe, rp.mean[0], rlo[0], rhi[0], facts, reason)
 
     notes = []
+    n_new = int(new_value[opt_idx].sum()) if len(opt_idx) else 0
+    if max_new is not None and n_new > max_new:
+        notes.append(f"처음 써 보는 값이 들어간 최적화 실험은 {max_new}건까지로 정했지만, "
+                     f"고정 조건과 범위 제한 안에 다른 조건이 부족해 {n_new}건이 됐다.")
     if len(suggestions) < settings.n_runs:
         notes.append(f"고정 조건과 범위 제한 안에서 서로 다른 조건을 {len(suggestions)}건만 찾았다 "
                      f"(요청 {settings.n_runs}건). 제한을 풀거나 한 번에 바꿀 조건 수를 늘리면 더 나온다.")
-    return Batch(uuid4().hex[:8], datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    # the letter prefix keeps spreadsheets and read_csv from turning an all-digit id into a number
+    return Batch("b" + uuid4().hex[:8], datetime.now(timezone.utc).isoformat(timespec="seconds"),
                  getattr(model, "name", type(model).__name__), settings, context, suggestions, notes)
 
 

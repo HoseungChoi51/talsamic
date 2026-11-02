@@ -43,7 +43,7 @@ def _initial(pool: pd.DataFrame, n: int, start: str, rng) -> np.ndarray:
 
 def run_campaign(bench: Benchmark, model: str, rounds: int = 8, batch: int = 8, learn: int = 2,
                  n_init: int = 10, start: str = "random", risk: str = "균형", radius: float | None = None,
-                 seed: int = 0, guard: bool = False, **model_kw) -> pd.DataFrame:
+                 seed: int = 0, guard: bool = False, max_new: int | None = None, **model_kw) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
     pool = _pool(bench)
     cols = [v.name for v in bench.schema.controls]
@@ -62,11 +62,13 @@ def run_campaign(bench: Benchmark, model: str, rounds: int = 8, batch: int = 8, 
             if guard:
                 factory = guarded(factory, bench.schema)
     settings = BatchSettings(risk=risk, n_runs=batch, split=(batch - learn, learn, 0),
-                             max_changes=len(cols), radius=radius, seed=seed)
+                             max_changes=len(cols), radius=radius, max_new=max_new, seed=seed)
 
     def record(r, secs):
         y = y_all[tested]
-        label = model + bench.name_suffix + ("+guard" if guard and model != "random" else "")
+        label = model + bench.name_suffix
+        if model != "random":
+            label += ("+guard" if guard else "") + (f"+new{max_new}" if max_new is not None else "")
         return {"benchmark": bench.name, "model": label, "seed": seed, "start": start, "risk": risk,
                 "round": r, "n_runs": int(tested.sum()), "best": float(y.max()),
                 "gap_to_best": float(y_all.max() - y.max()), "top1pct_found": int((tested & top).sum()),
@@ -107,6 +109,8 @@ def main(argv=None) -> None:
     ap.add_argument("--out", default="results/campaign.csv")
     ap.add_argument("--descriptors", help="folder of LLM descriptor tables (<benchmark>.json)")
     ap.add_argument("--guard", action="store_true", help="wrap models in the new-chemical guard (novelty.py)")
+    ap.add_argument("--max-new", type=int, help="optimize runs per batch that may use a never-run value "
+                                                "(default: the risk level's limit; needs --guard to matter)")
     a = ap.parse_args(argv)
 
     out = Path(a.out)
@@ -120,7 +124,7 @@ def main(argv=None) -> None:
             for seed in a.seeds:
                 try:
                     df = run_campaign(bench, m, a.rounds, a.batch, a.learn, a.n_init, a.start, a.risk,
-                                      a.radius, seed, guard=a.guard, **kw)
+                                      a.radius, seed, guard=a.guard, max_new=a.max_new, **kw)
                 except Exception as e:
                     traceback.print_exc()
                     print(f"{bname} {m} seed {seed}: ERROR {type(e).__name__}: {e}", flush=True)

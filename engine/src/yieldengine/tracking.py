@@ -26,7 +26,8 @@ def save_batch(batch: Batch, folder: str | Path) -> Path:
 
 def compare_with_actuals(saved: pd.DataFrame, actuals: pd.DataFrame, target: str = "yield") -> tuple[pd.DataFrame, dict]:
     """``saved`` is the exported batch CSV; ``actuals`` has ``batch_id``, ``run`` and the target."""
-    m = saved.merge(actuals[["batch_id", "run", target]], on=["batch_id", "run"], how="inner")
+    key = lambda df: df.assign(batch_id=df["batch_id"].astype(str), run=df["run"].astype(int))  # noqa: E731
+    m = key(saved).merge(key(actuals[["batch_id", "run", target]]), on=["batch_id", "run"], how="inner")
     m["error"] = m[target] - m["predicted"]
     m["in_range"] = (m[target] >= m["low"]) & (m[target] <= m["high"])
     n, k = len(m), int(m["in_range"].sum())

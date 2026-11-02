@@ -111,6 +111,7 @@ LLM guard can check any rephrasing.
 | 고정할 조건 | `fixed` | Fixed conditions are always applied. They don't count toward the change limit |
 | 범위 제한 | `limits` | `(lo, hi)` for numbers, or a list of allowed categories |
 | 한 번에 바꿀 조건 수 | `max_changes` | Maximum number of changes from the standard recipe |
+| 새 값 시도 | `max_new` | How many optimize runs may use a value never run before (a new ligand, base...). Set by the risk level: 0 / 1 / no limit. Fixed conditions don't count. Learn runs aren't limited, so new values get tried there |
 
 Learn runs come first from aliased groups: one condition is moved while its partner
 stays at the standard value. The remaining learn runs go to the most uncertain

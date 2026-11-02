@@ -85,3 +85,26 @@ def test_engine_paths_say_it_is_a_guess(factory, schema, no_c, history, context)
     for s in b.suggestions:
         if s.recipe["catalyst"] != "C":
             assert "처음 써 보는" not in s.reason
+
+
+def _opt_with_c(model, no_c, schema, context, history, **kw):
+    pool = history[[v.name for v in schema.controls]].drop_duplicates()
+    b = suggest_batch(model, no_c, schema, BatchSettings(n_runs=8, split=(6, 2, 0),
+                                                        max_changes=len(schema.controls), **kw), context,
+                      candidates=pool)
+    return b, sum(s.recipe["catalyst"] == "C" for s in b.suggestions if s.purpose == "최적화")
+
+
+@pytest.mark.parametrize("risk, limit", [("안전하게", 0), ("균형", 1)])
+def test_risk_level_limits_guesses_in_optimize_runs(factory, schema, no_c, history, context, risk, limit):
+    model = guarded(factory, schema)().fit(no_c)
+    _, n = _opt_with_c(model, no_c, schema, context, history, risk=risk)
+    assert n <= limit
+    _, n2 = _opt_with_c(model, no_c, schema, context, history, risk=risk, max_new=6)
+    assert n2 >= n
+
+
+def test_fixed_new_value_does_not_count(factory, schema, no_c, history, context):
+    model = guarded(factory, schema)().fit(no_c)
+    b, n = _opt_with_c(model, no_c, schema, context, history, risk="안전하게", fixed={"catalyst": "C"})
+    assert n == 6 and not any("처음 써 보는" in note for note in b.notes)
