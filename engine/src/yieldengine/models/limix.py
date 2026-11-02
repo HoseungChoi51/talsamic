@@ -20,11 +20,9 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
-
-from ..schema import FeatureEncoder, Schema
-from .base import ModelUnavailable, Prediction
+from ..schema import Schema
+from .base import ModelUnavailable
+from .incontext import InContextSurrogate
 
 HF_REPO = "stable-ai/LimiX-1_16M"
 HF_FILE = "LimiX-16M.ckpt"
@@ -69,57 +67,18 @@ def _load_predictor(device: str, ckpt: str | None, config: str | None, categoric
     )
 
 
-class LimiXSurrogate:
+class LimiXSurrogate(InContextSurrogate):
     name = "limix-16m"
+    license = "Stable AI Technology License (Apache-2.0 based, attribution and naming terms)"
+    commercial_use = None
+    install = "git clone https://github.com/limix-ldm-ai/LimiX && pip install -e LimiX"
+    load_args = ("ckpt", "config", "device", "predictor")
 
-    def __init__(
-        self,
-        schema: Schema,
-        ckpt: str | None = None,
-        config: str | None = None,
-        device: str = "auto",
-        n_bootstrap: int = 8,
-        n_folds: int = 5,
-        seed: int = 0,
-        predictor=None,  # inject a stand-in for tests
-    ):
-        self.schema = schema
-        self.encoder = FeatureEncoder(schema)
-        self.n_bootstrap = n_bootstrap
-        self.n_folds = n_folds
-        self.seed = seed
-        cat_idx = [i for i, v in enumerate(self.encoder.variables) if not v.is_continuous]
-        self._predictor = predictor or _load_predictor(device, ckpt, config, cat_idx, seed)
-        self._X: np.ndarray | None = None
-        self._y: np.ndarray | None = None
-        self._noise_sd = 0.0
+    def __init__(self, schema: Schema, *args, predictor=None, **kw):
+        super().__init__(schema, *args, runner=kw.pop("runner", None) or predictor, **kw)
 
-    def _call(self, Xc: np.ndarray, yc: np.ndarray, Xq: np.ndarray) -> np.ndarray:
-        return np.asarray(self._predictor.predict(Xc, yc, Xq, task_type="Regression"), float).reshape(-1)
+    def load(self, ckpt: str | None = None, config: str | None = None, device: str = "auto"):
+        return _load_predictor(device, ckpt, config, self.cat_idx, self.seed)
 
-    def fit(self, data: pd.DataFrame) -> "LimiXSurrogate":
-        self._X, _ = self.encoder.coded(data)
-        self._y = data[self.schema.target.name].to_numpy(float)
-        n = len(self._y)
-        rng = np.random.default_rng(self.seed)
-        folds = np.array_split(rng.permutation(n), min(self.n_folds, n))
-        resid = []
-        for f in folds:
-            mask = np.ones(n, bool)
-            mask[f] = False
-            resid.append(self._y[f] - self._call(self._X[mask], self._y[mask], self._X[f]))
-        self._noise_sd = float(np.std(np.concatenate(resid)))
-        return self
-
-    def predict(self, rows: pd.DataFrame) -> Prediction:
-        assert self._X is not None, "call fit first"
-        Xq, _ = self.encoder.coded(rows)
-        point = self._call(self._X, self._y, Xq)
-        rng = np.random.default_rng(self.seed + 1)
-        n = len(self._y)
-        boots = [point]
-        for _ in range(self.n_bootstrap - 1):
-            idx = rng.integers(0, n, n)
-            boots.append(self._call(self._X[idx], self._y[idx], Xq))
-        spread = np.std(np.stack(boots), axis=0)
-        return Prediction(point, np.sqrt(spread**2 + self._noise_sd**2))
+    def _call(self, Xc, yc, Xq):
+        return self._runner.predict(Xc, yc, Xq, task_type="Regression")

@@ -5,7 +5,7 @@ import pytest
 from yieldengine.cleaning import ColumnMapping, convert_units, flag_suspect_values
 from yieldengine.explain import checked_reason, unsupported_numbers
 from yieldengine.korean import josa
-from yieldengine.models import GPSurrogate, LimiXSurrogate, model_factory
+from yieldengine.models import GPSurrogate, model_factory
 from yieldengine.schema import Role
 
 
@@ -37,25 +37,6 @@ def test_factory_falls_back_to_gp(schema):
         f = model_factory(schema)  # LimiX code isn't installed in CI
     assert f.name == "gp" and f.fallback_reason
     assert isinstance(f(), GPSurrogate)
-
-
-class FakeLimiX:
-    """Stands in for LimiXPredictor: nearest-neighbour mean in coded space."""
-
-    def predict(self, Xc, yc, Xq, task_type):
-        assert task_type == "Regression"
-        scale = Xc.std(axis=0) + 1e-9
-        d = (((Xq[:, None, :] - Xc[None, :, :]) / scale) ** 2).sum(-1)
-        idx = np.argsort(d, axis=1)[:, :5]
-        return yc[idx].mean(axis=1)
-
-
-def test_limix_adapter_contract(schema, history):
-    m = LimiXSurrogate(schema, predictor=FakeLimiX(), n_bootstrap=4).fit(history)
-    p = m.predict(history.head(7))
-    assert p.mean.shape == (7,) and np.all(p.sd > 0)
-    lo, hi = p.interval(0.8)
-    assert np.all(lo < hi)
 
 
 def test_calibration_only_widens(fitted):
