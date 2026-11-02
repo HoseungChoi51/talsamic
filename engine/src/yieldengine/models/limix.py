@@ -20,12 +20,29 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+import numpy as np
+
 from ..schema import Schema
 from .base import ModelUnavailable
 from .incontext import InContextSurrogate
 
 HF_REPO = "stable-ai/LimiX-1_16M"
-HF_FILE = "LimiX-16M.ckpt"
+HF_FILE = "LimiX-1_16M.ckpt"
+
+
+def _redirect_limix_cache() -> None:
+    """LimiX v1 caches to a hard-coded /mnt/public/infe_cache, which normal users can't
+    create. Point that default at $LIMIX_CACHE_DIR or ~/.cache/limix/infe_cache instead."""
+    target = os.environ.get("LIMIX_CACHE_DIR", os.path.expanduser("~/.cache/limix/infe_cache"))
+    try:
+        from inference.v1_0 import predictor as v1
+    except Exception:
+        return
+    for obj in vars(v1).values():
+        init = getattr(obj, "__init__", None)
+        defaults = getattr(init, "__defaults__", None)
+        if isinstance(obj, type) and defaults and "/mnt/public/infe_cache" in defaults:
+            init.__defaults__ = tuple(target if d == "/mnt/public/infe_cache" else d for d in defaults)
 
 
 def _load_predictor(device: str, ckpt: str | None, config: str | None, categorical_idx: list[int], seed: int):
@@ -37,6 +54,7 @@ def _load_predictor(device: str, ckpt: str | None, config: str | None, categoric
 
     for k, v in {"RANK": "0", "WORLD_SIZE": "1", "MASTER_ADDR": "127.0.0.1", "MASTER_PORT": "29500"}.items():
         os.environ.setdefault(k, v)
+    _redirect_limix_cache()
 
     ckpt = ckpt or os.environ.get("YIELDENGINE_LIMIX_CKPT")
     if not ckpt:
@@ -81,4 +99,9 @@ class LimiXSurrogate(InContextSurrogate):
         return _load_predictor(device, ckpt, config, self.cat_idx, self.seed)
 
     def _call(self, Xc, yc, Xq):
-        return self._runner.predict(Xc, yc, Xq, task_type="Regression")
+        # LimiX v1 (1_16M checkpoint) answers regression in standardized units: scale y
+        # ourselves and map the output back (found on the RTX 5090 run, 2026-11-02).
+        yc = np.asarray(yc, float)
+        mu, sd = float(yc.mean()), float(yc.std()) or 1.0
+        out = self._runner.predict(Xc, (yc - mu) / sd, Xq, task_type="Regression")
+        return np.asarray(out, float) * sd + mu

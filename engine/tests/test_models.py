@@ -55,9 +55,9 @@ def _check(model, split):
 
 
 def test_limix_adapter(schema, split):
-    class FakeLimiX:
+    class FakeLimiX:  # like LimiX v1: answers in standardized units
         def predict(self, Xc, yc, Xq, task_type):
-            assert task_type == "Regression"
+            assert task_type == "Regression" and abs(np.mean(yc)) < 1e-6
             return _knn(Xc, yc, Xq)
 
     _check(LimiXSurrogate(schema, predictor=FakeLimiX(), n_bootstrap=3), split)
@@ -93,7 +93,9 @@ def test_tabfm_adapter(schema, split, monkeypatch):
 
     loader = types.SimpleNamespace(load=lambda model_type, checkpoint_path, device: "weights")
     _fake(monkeypatch, "tabfm", TabFMRegressor=Reg, tabfm_v1_1_0_pytorch=loader)
-    _check(TabFMSurrogate(schema, n_bootstrap=3), split)
+    m = TabFMSurrogate(schema, n_bootstrap=3)
+    assert m.version == "1.1.0"
+    _check(m, split)
 
 
 def test_mitra_adapter(schema, split, monkeypatch):

@@ -32,9 +32,18 @@ def test_josa():
     assert josa("원료 lot", "이") == "원료 lot이"
 
 
-def test_factory_falls_back_to_gp(schema):
+def test_factory_falls_back_to_gp(schema, monkeypatch):
+    def no_limix(name, *a, **k):
+        if name.startswith("inference"):
+            raise ImportError(name)
+        return real_import(name, *a, **k)
+
+    import builtins
+
+    real_import = builtins.__import__
+    monkeypatch.setattr(builtins, "__import__", no_limix)
     with pytest.warns(UserWarning):
-        f = model_factory(schema)  # LimiX code isn't installed in CI
+        f = model_factory(schema)
     assert f.name == "gp" and f.fallback_reason
     assert isinstance(f(), GPSurrogate)
 

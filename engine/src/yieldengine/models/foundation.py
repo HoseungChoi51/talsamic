@@ -60,32 +60,51 @@ class EXAONETabularSurrogate(InContextSurrogate):
 
 
 class TabFMSurrogate(InContextSurrogate):
-    """Google TabFM (v1.1.0 if the installed package has it, else v1.0.0), PyTorch build.
-    Takes a DataFrame and encodes categoricals itself."""
+    """Google TabFM, PyTorch build. Takes a DataFrame and encodes categoricals itself.
+
+    The tabfm package (1.0.1, on PyPI and GitHub main) only ships the v1.0.0 loader, so
+    for ``version="1.1.0"`` the 1.1.0 weights (google/tabfm-1.1.0-pytorch) are
+    downloaded and loaded through it. If that fails, the 1.0.0 weights are used and
+    ``self.version`` says so."""
 
     name = "tabfm"
     license = "TabFM Non-Commercial License v1.0 (weights); code Apache-2.0"
     commercial_use = False
-    install = 'pip install "tabfm[pytorch]"'
-    load_args = ("ckpt", "device")
+    install = 'pip install "tabfm[pytorch]" huggingface_hub'
+    load_args = ("ckpt", "device", "version")
+    REPOS = {"1.1.0": "google/tabfm-1.1.0-pytorch", "1.0.0": "google/tabfm-1.0.0-pytorch"}
 
     def __init__(self, schema, *args, n_estimators: int = 8, **kw):
         self.n_estimators = n_estimators
         super().__init__(schema, *args, **kw)
+        self.version = self._runner[2]
 
-    def load(self, ckpt=None, device="auto"):
+    def load(self, ckpt=None, device="auto", version="1.1.0"):
         tabfm = require("tabfm", self.install)
         loader = getattr(tabfm, "tabfm_v1_1_0_pytorch", None) or getattr(tabfm, "tabfm_v1_0_0_pytorch", None)
         if loader is None:
             raise ModelUnavailable("tabfm is installed without the PyTorch build; " + self.install)
+        dev = resolve_device(device)
+        native = "1.1.0" if hasattr(tabfm, "tabfm_v1_1_0_pytorch") else "1.0.0"
+        if ckpt is None and version != native:
+            try:
+                from huggingface_hub import snapshot_download
+
+                local = snapshot_download(self.REPOS[version], allow_patterns=["regression/*", "regression/**"])
+                return (tabfm.TabFMRegressor,
+                        loader.load(model_type="regression", checkpoint_path=local, device=dev), version)
+            except Exception as e:
+                import warnings
+
+                warnings.warn(f"TabFM {version} weights did not load with the {native} loader ({e}); using {native}")
         try:
-            model = loader.load(model_type="regression", checkpoint_path=ckpt, device=resolve_device(device))
+            model = loader.load(model_type="regression", checkpoint_path=ckpt, device=dev)
         except Exception as e:
             raise ModelUnavailable(f"TabFM weights could not be loaded: {e}") from e
-        return (tabfm.TabFMRegressor, model)
+        return (tabfm.TabFMRegressor, model, "local" if ckpt else native)
 
     def _call(self, Xc, yc, Xq):
-        Regressor, model = self._runner
+        Regressor, model, _ = self._runner
         reg = Regressor(model=model, n_estimators=self.n_estimators, random_state=self.seed)
         reg.fit(self.frame(Xc), yc)
         return reg.predict(self.frame(Xq))
