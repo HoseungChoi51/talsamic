@@ -1,0 +1,625 @@
+[
+  {
+    "variable": "ligand",
+    "values": {
+      "steric_bulk": {
+        "AdBrettPhos": 5.0,
+        "XPhos": 4.0,
+        "tBuBrettPhos": 5.0,
+        "tBuXPhos": 5.0
+      },
+      "electron_richness": {
+        "AdBrettPhos": 5.0,
+        "XPhos": 4.0,
+        "tBuBrettPhos": 5.0,
+        "tBuXPhos": 5.0
+      },
+      "cone_angle_deg": {
+        "AdBrettPhos": 205.0,
+        "XPhos": 190.0,
+        "tBuBrettPhos": 200.0,
+        "tBuXPhos": 198.0
+      },
+      "biaryl_phosphine": {
+        "AdBrettPhos": 1.0,
+        "XPhos": 1.0,
+        "tBuBrettPhos": 1.0,
+        "tBuXPhos": 1.0
+      },
+      "bidentate": {
+        "AdBrettPhos": 0.0,
+        "XPhos": 0.0,
+        "tBuBrettPhos": 0.0,
+        "tBuXPhos": 0.0
+      }
+    },
+    "spread": {
+      "steric_bulk": {
+        "AdBrettPhos": 0.0,
+        "XPhos": 0.5,
+        "tBuBrettPhos": 0.0,
+        "tBuXPhos": 0.0
+      },
+      "electron_richness": {
+        "AdBrettPhos": 0.5,
+        "XPhos": 0.5,
+        "tBuBrettPhos": 0.0,
+        "tBuXPhos": 0.0
+      },
+      "cone_angle_deg": {
+        "AdBrettPhos": 20.0,
+        "XPhos": 30.0,
+        "tBuBrettPhos": 30.0,
+        "tBuXPhos": 25.0
+      },
+      "biaryl_phosphine": {
+        "AdBrettPhos": 0.0,
+        "XPhos": 0.0,
+        "tBuBrettPhos": 0.0,
+        "tBuXPhos": 0.0
+      },
+      "bidentate": {
+        "AdBrettPhos": 0.0,
+        "XPhos": 0.0,
+        "tBuBrettPhos": 0.0,
+        "tBuXPhos": 0.0
+      }
+    },
+    "spec": [
+      {
+        "name": "steric_bulk",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "bulk around the metal: 1 small (PMe3) to 5 very bulky (P(tBu)3, AdBrettPhos)"
+      },
+      {
+        "name": "electron_richness",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "sigma-donor strength: 1 poor (P(2-furyl)3) to 5 very rich (P(tBu)3, PCy3)"
+      },
+      {
+        "name": "cone_angle_deg",
+        "lower": 100,
+        "upper": 220,
+        "meaning": "Tolman cone angle estimate in degrees"
+      },
+      {
+        "name": "biaryl_phosphine",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if a Buchwald-type dialkylbiaryl phosphine, else 0"
+      },
+      {
+        "name": "bidentate",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if it binds through two donor atoms, else 0"
+      }
+    ],
+    "model": "qwen3.8-flash-next",
+    "n_samples": 3,
+    "issues": [],
+    "notes": [
+      "Cone angles and steric/electronic scores are approximate because biaryl phosphines are non-spherical and the BrettPhos SMILES shown include methoxy substituents.",
+      "Cone angles and steric/electronic ratings are estimated from known Buchwald ligand trends rather than experimental values.",
+      "Cone angles for these highly hindered Buchwald ligands are often estimated above 220°, so I capped or placed them near the top of the requested range."
+    ],
+    "created_at": "2026-11-02T13:38:18+00:00",
+    "confirmed_by": null
+  },
+  {
+    "variable": "base",
+    "values": {
+      "pka_conjugate_acid": {
+        "BTMG": 23.5,
+        "MTBD": 25.0,
+        "P2Et": 29.5
+      },
+      "strength": {
+        "BTMG": 4.0,
+        "MTBD": 4.0,
+        "P2Et": 5.0
+      },
+      "organic": {
+        "BTMG": 1.0,
+        "MTBD": 1.0,
+        "P2Et": 1.0
+      },
+      "cation_size": {
+        "BTMG": 0.0,
+        "MTBD": 0.0,
+        "P2Et": 0.0
+      },
+      "steric_bulk": {
+        "BTMG": 4.0,
+        "MTBD": 3.0,
+        "P2Et": 4.0
+      }
+    },
+    "spread": {
+      "pka_conjugate_acid": {
+        "BTMG": 9.9,
+        "MTBD": 8.8,
+        "P2Et": 0.5
+      },
+      "strength": {
+        "BTMG": 0.0,
+        "MTBD": 0.0,
+        "P2Et": 0.0
+      },
+      "organic": {
+        "BTMG": 0.0,
+        "MTBD": 0.0,
+        "P2Et": 0.0
+      },
+      "cation_size": {
+        "BTMG": 0.0,
+        "MTBD": 0.0,
+        "P2Et": 0.0
+      },
+      "steric_bulk": {
+        "BTMG": 0.0,
+        "MTBD": 0.0,
+        "P2Et": 1.0
+      }
+    },
+    "spec": [
+      {
+        "name": "pka_conjugate_acid",
+        "lower": 0,
+        "upper": 40,
+        "meaning": "pKa of the conjugate acid in DMSO (estimate)"
+      },
+      {
+        "name": "strength",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "1 weak (acetate) to 5 very strong (alkoxide, phosphazene)"
+      },
+      {
+        "name": "organic",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if an organic (soluble, non-metal) base, else 0"
+      },
+      {
+        "name": "cation_size",
+        "lower": 0,
+        "upper": 5,
+        "meaning": "0 none/organic, 1 Li, 2 Na, 3 K, 4 Rb, 5 Cs"
+      },
+      {
+        "name": "steric_bulk",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "1 small to 5 very hindered"
+      }
+    ],
+    "model": "qwen3.8-flash-next",
+    "n_samples": 3,
+    "issues": [],
+    "notes": [
+      "pKa values are approximate DMSO conjugate-acid estimates, and strength/bulk are qualitative rankings.",
+      "pKa values are approximate DMSO estimates for conjugate acids, and strength/steric ratings are qualitative.",
+      "DMSO pKaH values and steric ratings are approximate and can vary with measurement scale and conformation."
+    ],
+    "created_at": "2026-11-02T13:42:13+00:00",
+    "confirmed_by": null
+  },
+  {
+    "variable": "aryl_halide",
+    "values": {
+      "halide_reactivity": {
+        "1-ethyl-4-bromobenzene": 3.0,
+        "1-ethyl-4-chlorobenzene": 1.0,
+        "1-ethyl-4-iodobenzene": 5.0,
+        "2-bromopyridine": 3.0,
+        "2-chloropyridine": 1.0,
+        "2-iodopyridine": 5.0,
+        "3-bromopyridine": 3.0,
+        "3-chloropyridine": 1.0,
+        "3-iodopyridine": 5.0,
+        "4-bromoanisole": 3.0,
+        "4-bromobenzotrifluoride": 3.0,
+        "4-chloroanisole": 1.0,
+        "4-chlorobenzotrifluoride": 1.0,
+        "4-iodoanisole": 5.0,
+        "4-iodobenzotrifluoride": 5.0
+      },
+      "ring_electron_poor": {
+        "1-ethyl-4-bromobenzene": 2.0,
+        "1-ethyl-4-chlorobenzene": 2.0,
+        "1-ethyl-4-iodobenzene": 2.0,
+        "2-bromopyridine": 5.0,
+        "2-chloropyridine": 5.0,
+        "2-iodopyridine": 5.0,
+        "3-bromopyridine": 5.0,
+        "3-chloropyridine": 5.0,
+        "3-iodopyridine": 5.0,
+        "4-bromoanisole": 1.0,
+        "4-bromobenzotrifluoride": 5.0,
+        "4-chloroanisole": 1.0,
+        "4-chlorobenzotrifluoride": 5.0,
+        "4-iodoanisole": 1.0,
+        "4-iodobenzotrifluoride": 5.0
+      },
+      "heteroaryl": {
+        "1-ethyl-4-bromobenzene": 0.0,
+        "1-ethyl-4-chlorobenzene": 0.0,
+        "1-ethyl-4-iodobenzene": 0.0,
+        "2-bromopyridine": 1.0,
+        "2-chloropyridine": 1.0,
+        "2-iodopyridine": 1.0,
+        "3-bromopyridine": 1.0,
+        "3-chloropyridine": 1.0,
+        "3-iodopyridine": 1.0,
+        "4-bromoanisole": 0.0,
+        "4-bromobenzotrifluoride": 0.0,
+        "4-chloroanisole": 0.0,
+        "4-chlorobenzotrifluoride": 0.0,
+        "4-iodoanisole": 0.0,
+        "4-iodobenzotrifluoride": 0.0
+      },
+      "n_adjacent_to_halide": {
+        "1-ethyl-4-bromobenzene": 0.0,
+        "1-ethyl-4-chlorobenzene": 0.0,
+        "1-ethyl-4-iodobenzene": 0.0,
+        "2-bromopyridine": 1.0,
+        "2-chloropyridine": 1.0,
+        "2-iodopyridine": 1.0,
+        "3-bromopyridine": 0.0,
+        "3-chloropyridine": 0.0,
+        "3-iodopyridine": 0.0,
+        "4-bromoanisole": 0.0,
+        "4-bromobenzotrifluoride": 0.0,
+        "4-chloroanisole": 0.0,
+        "4-chlorobenzotrifluoride": 0.0,
+        "4-iodoanisole": 0.0,
+        "4-iodobenzotrifluoride": 0.0
+      }
+    },
+    "spread": {
+      "halide_reactivity": {
+        "1-ethyl-4-bromobenzene": 0.0,
+        "1-ethyl-4-chlorobenzene": 0.0,
+        "1-ethyl-4-iodobenzene": 0.0,
+        "2-bromopyridine": 0.0,
+        "2-chloropyridine": 0.0,
+        "2-iodopyridine": 0.0,
+        "3-bromopyridine": 0.0,
+        "3-chloropyridine": 0.0,
+        "3-iodopyridine": 0.0,
+        "4-bromoanisole": 0.0,
+        "4-bromobenzotrifluoride": 0.0,
+        "4-chloroanisole": 0.0,
+        "4-chlorobenzotrifluoride": 0.0,
+        "4-iodoanisole": 0.0,
+        "4-iodobenzotrifluoride": 0.0
+      },
+      "ring_electron_poor": {
+        "1-ethyl-4-bromobenzene": 0.0,
+        "1-ethyl-4-chlorobenzene": 0.0,
+        "1-ethyl-4-iodobenzene": 0.0,
+        "2-bromopyridine": 0.0,
+        "2-chloropyridine": 0.0,
+        "2-iodopyridine": 0.0,
+        "3-bromopyridine": 0.0,
+        "3-chloropyridine": 0.0,
+        "3-iodopyridine": 0.0,
+        "4-bromoanisole": 0.0,
+        "4-bromobenzotrifluoride": 0.0,
+        "4-chloroanisole": 0.0,
+        "4-chlorobenzotrifluoride": 0.0,
+        "4-iodoanisole": 0.0,
+        "4-iodobenzotrifluoride": 0.0
+      },
+      "heteroaryl": {
+        "1-ethyl-4-bromobenzene": 0.0,
+        "1-ethyl-4-chlorobenzene": 0.0,
+        "1-ethyl-4-iodobenzene": 0.0,
+        "2-bromopyridine": 0.0,
+        "2-chloropyridine": 0.0,
+        "2-iodopyridine": 0.0,
+        "3-bromopyridine": 0.0,
+        "3-chloropyridine": 0.0,
+        "3-iodopyridine": 0.0,
+        "4-bromoanisole": 0.0,
+        "4-bromobenzotrifluoride": 0.0,
+        "4-chloroanisole": 0.0,
+        "4-chlorobenzotrifluoride": 0.0,
+        "4-iodoanisole": 0.0,
+        "4-iodobenzotrifluoride": 0.0
+      },
+      "n_adjacent_to_halide": {
+        "1-ethyl-4-bromobenzene": 0.0,
+        "1-ethyl-4-chlorobenzene": 0.0,
+        "1-ethyl-4-iodobenzene": 0.0,
+        "2-bromopyridine": 0.0,
+        "2-chloropyridine": 0.0,
+        "2-iodopyridine": 0.0,
+        "3-bromopyridine": 0.0,
+        "3-chloropyridine": 0.0,
+        "3-iodopyridine": 0.0,
+        "4-bromoanisole": 0.0,
+        "4-bromobenzotrifluoride": 0.0,
+        "4-chloroanisole": 0.0,
+        "4-chlorobenzotrifluoride": 0.0,
+        "4-iodoanisole": 0.0,
+        "4-iodobenzotrifluoride": 0.0
+      }
+    },
+    "spec": [
+      {
+        "name": "halide_reactivity",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "ease of oxidative addition: Cl 1, Br 3, I 5"
+      },
+      {
+        "name": "ring_electron_poor",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "1 electron-rich ring (anisole) to 5 electron-poor (CF3-arene, pyridine)"
+      },
+      {
+        "name": "heteroaryl",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if the ring is a heteroarene, else 0"
+      },
+      {
+        "name": "n_adjacent_to_halide",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if a ring nitrogen sits next to the C-X carbon, else 0"
+      }
+    ],
+    "model": "qwen3.8-flash-next",
+    "n_samples": 3,
+    "issues": [],
+    "notes": [
+      "Ethylbenzene derivatives were assigned 2 because ethyl is weakly electron-donating, though the halogen substituent makes the exact value somewhat uncertain.",
+      "Ring_electron_poor values are approximate: anisoles were set to 1, ethylbenzenes to 2, and CF3-arenes/pyridines to 5.",
+      "Ethylbenzene derivatives were estimated as mildly electron-rich (2), while anisoles were set to 1 and pyridines/CF3-arenes to 5."
+    ],
+    "created_at": "2026-11-02T13:46:01+00:00",
+    "confirmed_by": null
+  },
+  {
+    "variable": "additive",
+    "values": {
+      "catalyst_poisoning": {
+        "A01": 2.0,
+        "A02": 2.0,
+        "A03": 1.0,
+        "A04": 5.0,
+        "A05": 4.0,
+        "A06": 2.0,
+        "A07": 2.0,
+        "A08": 1.0,
+        "A09": 1.0,
+        "A10": 2.0,
+        "A11": 2.0,
+        "A12": 2.0,
+        "A13": 1.0,
+        "A14": 2.0,
+        "A15": 2.0,
+        "A16": 1.0,
+        "A17": 1.0,
+        "A18": 1.0,
+        "A19": 1.0,
+        "A20": 1.0,
+        "A21": 1.0,
+        "A22": 1.0
+      },
+      "electron_withdrawing": {
+        "A01": 2.0,
+        "A02": 2.0,
+        "A03": 2.0,
+        "A04": 1.0,
+        "A05": 1.0,
+        "A06": 2.0,
+        "A07": 2.0,
+        "A08": 4.0,
+        "A09": 4.0,
+        "A10": 1.0,
+        "A11": 2.0,
+        "A12": 1.0,
+        "A13": 4.0,
+        "A14": 2.0,
+        "A15": 1.0,
+        "A16": 4.0,
+        "A17": 4.0,
+        "A18": 4.0,
+        "A19": 4.0,
+        "A20": 4.0,
+        "A21": 4.0,
+        "A22": 4.0
+      },
+      "hindrance_near_n": {
+        "A01": 1.0,
+        "A02": 2.0,
+        "A03": 4.0,
+        "A04": 2.0,
+        "A05": 5.0,
+        "A06": 2.0,
+        "A07": 3.0,
+        "A08": 2.0,
+        "A09": 3.0,
+        "A10": 2.0,
+        "A11": 4.0,
+        "A12": 1.0,
+        "A13": 2.0,
+        "A14": 2.0,
+        "A15": 2.0,
+        "A16": 2.0,
+        "A17": 3.0,
+        "A18": 2.0,
+        "A19": 1.0,
+        "A20": 1.0,
+        "A21": 3.0,
+        "A22": 3.0
+      },
+      "n_o_bond_lability": {
+        "A01": 3.0,
+        "A02": 3.0,
+        "A03": 3.0,
+        "A04": 2.0,
+        "A05": 3.0,
+        "A06": 4.0,
+        "A07": 4.0,
+        "A08": 3.0,
+        "A09": 4.0,
+        "A10": 2.0,
+        "A11": 3.0,
+        "A12": 2.0,
+        "A13": 3.0,
+        "A14": 3.0,
+        "A15": 2.0,
+        "A16": 3.0,
+        "A17": 4.0,
+        "A18": 3.0,
+        "A19": 4.0,
+        "A20": 3.0,
+        "A21": 4.0,
+        "A22": 4.0
+      }
+    },
+    "spread": {
+      "catalyst_poisoning": {
+        "A01": null,
+        "A02": null,
+        "A03": null,
+        "A04": null,
+        "A05": null,
+        "A06": null,
+        "A07": null,
+        "A08": null,
+        "A09": null,
+        "A10": null,
+        "A11": null,
+        "A12": null,
+        "A13": null,
+        "A14": null,
+        "A15": null,
+        "A16": null,
+        "A17": null,
+        "A18": null,
+        "A19": null,
+        "A20": null,
+        "A21": null,
+        "A22": null
+      },
+      "electron_withdrawing": {
+        "A01": null,
+        "A02": null,
+        "A03": null,
+        "A04": null,
+        "A05": null,
+        "A06": null,
+        "A07": null,
+        "A08": null,
+        "A09": null,
+        "A10": null,
+        "A11": null,
+        "A12": null,
+        "A13": null,
+        "A14": null,
+        "A15": null,
+        "A16": null,
+        "A17": null,
+        "A18": null,
+        "A19": null,
+        "A20": null,
+        "A21": null,
+        "A22": null
+      },
+      "hindrance_near_n": {
+        "A01": null,
+        "A02": null,
+        "A03": null,
+        "A04": null,
+        "A05": null,
+        "A06": null,
+        "A07": null,
+        "A08": null,
+        "A09": null,
+        "A10": null,
+        "A11": null,
+        "A12": null,
+        "A13": null,
+        "A14": null,
+        "A15": null,
+        "A16": null,
+        "A17": null,
+        "A18": null,
+        "A19": null,
+        "A20": null,
+        "A21": null,
+        "A22": null
+      },
+      "n_o_bond_lability": {
+        "A01": null,
+        "A02": null,
+        "A03": null,
+        "A04": null,
+        "A05": null,
+        "A06": null,
+        "A07": null,
+        "A08": null,
+        "A09": null,
+        "A10": null,
+        "A11": null,
+        "A12": null,
+        "A13": null,
+        "A14": null,
+        "A15": null,
+        "A16": null,
+        "A17": null,
+        "A18": null,
+        "A19": null,
+        "A20": null,
+        "A21": null,
+        "A22": null
+      }
+    },
+    "spec": [
+      {
+        "name": "catalyst_poisoning",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "how strongly it can bind Pd and inhibit the catalyst"
+      },
+      {
+        "name": "electron_withdrawing",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "electron-withdrawing character of its substituents"
+      },
+      {
+        "name": "hindrance_near_n",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "steric hindrance next to the coordinating nitrogen"
+      },
+      {
+        "name": "n_o_bond_lability",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "how easily an N-O bond opens (isoxazole ring opening); 1 if none"
+      }
+    ],
+    "model": "qwen3.8-flash-next",
+    "n_samples": 1,
+    "issues": [
+      "sample 0: unusable reply (TimeoutError: timed out)",
+      "sample 2: unusable reply (TimeoutError: timed out)"
+    ],
+    "notes": [
+      "Estimates are relative and assume the isoxazole ring nitrogen is the principal Pd-binding site, with exocyclic amines, esters, aryl groups, and fused rings treated as electronic/steric modifiers."
+    ],
+    "created_at": "2026-11-02T14:15:55+00:00",
+    "confirmed_by": null
+  }
+]

@@ -159,7 +159,9 @@ def propose(var: Variable, client: ChatClient, smiles: dict[str, str] | None = N
             med = np.nanmedian(arr, axis=0)
             rng = np.nanmax(arr, axis=0) - np.nanmin(arr, axis=0)
         values[d.name] = {c: (None if np.isnan(m) else round(float(m), 3)) for c, m in zip(var.categories, med)}
-        spread[d.name] = {c: (None if np.isnan(r) else round(float(r), 3)) for c, r in zip(var.categories, rng)}
+        # with one usable sample there is no spread to measure: None, not a reassuring 0
+        spread[d.name] = {c: (None if np.isnan(r) or len(samples) < 2 else round(float(r), 3))
+                          for c, r in zip(var.categories, rng)}
     return DescriptorTable(var.name, values, spread, [asdict(d) for d in spec], client.model, len(samples),
                            issues, notes, datetime.now(timezone.utc).isoformat(timespec="seconds"))
 
@@ -199,19 +201,26 @@ def main(argv=None) -> None:
     ap.add_argument("--url")
     ap.add_argument("--model")
     ap.add_argument("--samples", type=int, default=3)
+    ap.add_argument("--timeout", type=float, help="seconds per LLM call (default 1800, or $YIELDENGINE_LLM_TIMEOUT)")
+    ap.add_argument("--variables", nargs="+",
+                    help="redo only these conditions and replace their tables in the existing <out>/<benchmark>.json")
     a = ap.parse_args(argv)
-    client = ChatClient(**{k: v for k, v in {"url": a.url, "model": a.model}.items() if v})
+    client = ChatClient(**{k: v for k, v in {"url": a.url, "model": a.model, "timeout": a.timeout}.items() if v})
     for name in a.benchmark:
         bench = load(name)
-        tables = []
+        path = Path(a.out) / f"{name}.json"
+        keep = load_tables(path) if a.variables and path.exists() else []
+        tables = {t.variable: t for t in keep}
         for v in bench.schema.controls:
-            if v.is_continuous:
+            if v.is_continuous or (a.variables and v.name not in a.variables):
                 continue
             t = propose(v, client, bench.smiles.get(v.name), bench.description, a.samples)
-            print(f"{name}.{v.name}: {len(v.categories)} options, {len(t.issues)} issues; " + "; ".join(t.notes)[:300],
-                  flush=True)
-            tables.append(t)
-        save(tables, Path(a.out) / f"{name}.json")
+            print(f"{name}.{v.name}: {len(v.categories)} options, {t.n_samples} samples, {len(t.issues)} issues; "
+                  + "; ".join(t.notes)[:300], flush=True)
+            tables[v.name] = t
+        order = [v.name for v in bench.schema.controls]
+        save(sorted(tables.values(), key=lambda t: order.index(t.variable) if t.variable in order else len(order)),
+             path)
 
 
 if __name__ == "__main__":

@@ -72,3 +72,49 @@ def test_descriptors_help_on_unseen_category():
         m = model_factory(schema, "gp", n_restarts=0)().fit(train)
         err[name] = float(np.sqrt(np.mean((m.predict(test).mean - test["yield"].to_numpy()) ** 2)))
     assert err["llm"] < 0.7 * err["plain"]
+
+
+class FlakyLLM(FakeLLM):
+    """None in the reply list = this call times out."""
+
+    def chat(self, system, user, **kw):
+        r = self.replies.pop(0)
+        if r is None:
+            raise TimeoutError("timed out")
+        return r
+
+
+def test_one_usable_sample_has_no_spread():
+    t = propose(_toy().schema["ligand"], FlakyLLM([None, _reply(), None]), n_samples=3)
+    assert t.n_samples == 1 and t.spread["steric_bulk"]["L1"] is None  # unknown, not "confident"
+    assert sum("timed out" in i for i in t.issues) == 2
+
+
+def test_cli_redoes_only_named_variables(tmp_path, monkeypatch):
+    import yieldengine.benchmarks.datasets as datasets
+    import yieldengine.llm.descriptors as descriptors
+
+    base_reply = json.dumps({"values": {b: {"pka_conjugate_acid": 10, "strength": s, "organic": 0, "cation_size": 3,
+                                            "steric_bulk": 1} for b, s in (("B1", 1), ("B2", 4))}})
+
+    class ByVariable:
+        model = "fake"
+
+        def __init__(self, **kw):
+            self.kw = kw
+
+        def chat(self, system, user, **kw):
+            return _reply(bulk_l1=bulk[0]) if "L1" in user else base_reply
+
+    monkeypatch.setattr(datasets, "load", lambda name, descriptors=None: _toy())
+    monkeypatch.setattr(descriptors, "ChatClient", ByVariable)
+    bulk = [1]
+    descriptors.main(["--benchmark", "direct_arylation", "--out", str(tmp_path), "--samples", "1"])
+    first = {t.variable: t for t in load_tables(tmp_path / "direct_arylation.json")}
+    bulk[0] = 4
+    descriptors.main(["--benchmark", "direct_arylation", "--out", str(tmp_path), "--samples", "1",
+                      "--variables", "ligand", "--timeout", "60"])
+    second = {t.variable: t for t in load_tables(tmp_path / "direct_arylation.json")}
+    assert list(second) == ["ligand", "base"]
+    assert first["ligand"].values["steric_bulk"]["L1"] == 1 and second["ligand"].values["steric_bulk"]["L1"] == 4
+    assert second["base"].created_at == first["base"].created_at  # kept as it was
