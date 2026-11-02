@@ -58,9 +58,13 @@ def test_limix_adapter(schema, split):
     class FakeLimiX:  # like LimiX v1: answers in standardized units
         def predict(self, Xc, yc, Xq, task_type):
             assert task_type == "Regression" and abs(np.mean(yc)) < 1e-6
+            assert len(Xq) >= 2, "real LimiX v1 crashes on one query row"
             return _knn(Xc, yc, Xq)
 
-    _check(LimiXSurrogate(schema, predictor=FakeLimiX(), n_bootstrap=3), split)
+    m = LimiXSurrogate(schema, predictor=FakeLimiX(), n_bootstrap=3)
+    _check(m, split)
+    one = m.predict(split[1].head(1))  # a single row (the standard recipe) must work too
+    assert one.mean.shape == (1,)
 
 
 def test_exaone_adapter(schema, split, monkeypatch):

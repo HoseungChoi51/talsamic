@@ -85,11 +85,16 @@ class InContextSurrogate:
         return df
 
     # -- Surrogate interface ----------------------------------------------------------------
+    MIN_QUERY_ROWS = 2  # LimiX v1 squeezes away the row axis for a single query row and crashes
+
     def _pass(self, Xc, yc, Xq) -> np.ndarray:
+        n = Xq.shape[0]
+        if n < self.MIN_QUERY_ROWS:  # e.g. predicting only the standard recipe
+            Xq = np.concatenate([Xq] + [Xq[:1]] * (self.MIN_QUERY_ROWS - n))
         out = np.asarray(self._call(Xc, yc, Xq), float).reshape(-1)
         if out.shape[0] != Xq.shape[0]:
             raise RuntimeError(f"{self.name} returned {out.shape[0]} predictions for {Xq.shape[0]} rows")
-        return out
+        return out[:n]
 
     def fit(self, data: pd.DataFrame):
         self._X, _ = self.encoder.coded(data)
