@@ -38,11 +38,21 @@ def _redirect_limix_cache() -> None:
         from inference.v1_0 import predictor as v1
     except Exception:
         return
+    def patch(cls, seen):
+        if id(cls) in seen:
+            return
+        seen.add(id(cls))
+        defaults = getattr(cls.__dict__.get("__init__"), "__defaults__", None)
+        if defaults and "/mnt/public/infe_cache" in defaults:
+            cls.__init__.__defaults__ = tuple(target if d == "/mnt/public/infe_cache" else d for d in defaults)
+        for inner in vars(cls).values():  # CacheManager is nested inside LimiXPredictor
+            if isinstance(inner, type):
+                patch(inner, seen)
+
+    seen: set[int] = set()
     for obj in vars(v1).values():
-        init = getattr(obj, "__init__", None)
-        defaults = getattr(init, "__defaults__", None)
-        if isinstance(obj, type) and defaults and "/mnt/public/infe_cache" in defaults:
-            init.__defaults__ = tuple(target if d == "/mnt/public/infe_cache" else d for d in defaults)
+        if isinstance(obj, type) and getattr(obj, "__module__", "").startswith("inference"):
+            patch(obj, seen)
 
 
 def _load_predictor(device: str, ckpt: str | None, config: str | None, categorical_idx: list[int], seed: int):

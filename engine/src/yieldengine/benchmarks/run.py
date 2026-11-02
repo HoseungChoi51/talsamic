@@ -30,6 +30,7 @@ def main(argv=None) -> None:
     ap.add_argument("--max-context", type=int)
     ap.add_argument("--out", default="results/prediction.csv")
     ap.add_argument("--skip-done", action="store_true")
+    ap.add_argument("--descriptors", help="folder of LLM descriptor tables (<benchmark>.json)")
     a = ap.parse_args(argv)
 
     out = Path(a.out)
@@ -40,12 +41,12 @@ def main(argv=None) -> None:
         done = set(zip(prev.benchmark, prev.split, prev.model))
     rows = []
     for bname in a.benchmarks:
-        bench = load(bname)
+        bench = load(bname, a.descriptors)
         for split in a.splits or list(bench.splits):
             if split not in bench.splits:
                 continue
             for m in a.models:
-                if (bname, split, m) in done:
+                if (bname, split, m + bench.name_suffix) in done:
                     continue
                 kw = {"n_restarts": 0} if m == "gp" else {"device": a.device, "n_bootstrap": a.n_bootstrap}
                 try:

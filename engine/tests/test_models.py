@@ -148,3 +148,25 @@ def test_model_info_flags_noncommercial():
     assert set(info) == set(REGISTRY)
     assert info["exaone-tabular"]["commercial_use"] is False and info["tabfm"]["commercial_use"] is False
     assert info["mitra"]["commercial_use"] is True and info["gp"]["commercial_use"] is True
+
+
+def test_limix_cache_redirect_reaches_nested_class(monkeypatch, tmp_path):
+    from yieldengine.models.limix import _redirect_limix_cache
+
+    class LimiXPredictor:
+        class CacheManager:
+            def __init__(self, cache_dir="/mnt/public/infe_cache"):
+                self.cache_dir = cache_dir
+
+    LimiXPredictor.__module__ = LimiXPredictor.CacheManager.__module__ = "inference.v1_0.predictor"
+    pkg = types.ModuleType("inference")
+    sub = types.ModuleType("inference.v1_0")
+    mod = types.ModuleType("inference.v1_0.predictor")
+    mod.LimiXPredictor = LimiXPredictor
+    sub.predictor = mod
+    pkg.v1_0 = sub
+    for name, m in (("inference", pkg), ("inference.v1_0", sub), ("inference.v1_0.predictor", mod)):
+        monkeypatch.setitem(sys.modules, name, m)
+    monkeypatch.setenv("LIMIX_CACHE_DIR", str(tmp_path))
+    _redirect_limix_cache()
+    assert LimiXPredictor.CacheManager().cache_dir == str(tmp_path)

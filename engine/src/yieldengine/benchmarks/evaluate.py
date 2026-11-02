@@ -38,7 +38,7 @@ def evaluate(bench: Benchmark, split: str, model: str, max_context: int | None =
     lo, hi = p.interval(0.8)
     ss_tot = float(np.sum((y - y.mean()) ** 2))
     return {
-        "benchmark": bench.name, "split": split, "model": model, "n_train": len(train), "n_test": len(test),
+        "benchmark": bench.name, "split": split, "model": model + bench.name_suffix, "n_train": len(train), "n_test": len(test),
         "rmse": float(np.sqrt(np.mean(err**2))), "mae": float(np.mean(np.abs(err))),
         "r2": 1 - float(np.sum(err**2)) / ss_tot if ss_tot > 0 else float("nan"),
         "coverage80": float(np.mean((y >= lo) & (y <= hi))), "width80": float(np.mean(hi - lo)),

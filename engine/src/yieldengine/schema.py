@@ -40,6 +40,10 @@ class Variable:
     standard: Any = None  # value in the standard recipe
     unit: str = ""
     step: float | None = None  # resolution engineers can actually set
+    # numeric descriptors of each category, e.g. {"steric_bulk": {"XPhos": 4, "PPh3": 2}}.
+    # Proposed by the LLM, confirmed by an engineer; they let a model reason about a
+    # category it has never seen in the data (see llm/descriptors.py).
+    descriptors: dict[str, dict[str, float]] = field(default_factory=dict)
 
     @property
     def is_continuous(self) -> bool:
@@ -118,6 +122,17 @@ class FeatureEncoder:
         self.schema = schema
         self.variables = list(variables) if variables is not None else schema.features
 
+    def _descriptors(self, df: pd.DataFrame, scaled: bool) -> list[np.ndarray]:
+        cols = []
+        for v in self.variables:
+            for _, table in sorted(v.descriptors.items()):
+                vals = np.array(list(table.values()), float)
+                lo, hi = np.nanmin(vals), np.nanmax(vals)
+                x = df[v.name].astype(str).map(table).astype(float).to_numpy()
+                x = np.where(np.isnan(x), np.nanmean(vals), x)  # category with no descriptor
+                cols.append((x - lo) / (hi - lo) if scaled and hi > lo else x)
+        return cols
+
     def numeric(self, df: pd.DataFrame) -> np.ndarray:
         cols = []
         for v in self.variables:
@@ -126,7 +141,11 @@ class FeatureEncoder:
             else:
                 vals = df[v.name].astype(str).to_numpy()
                 cols.append(np.stack([(vals == c).astype(float) for c in v.categories], axis=1))
+        cols += [c[:, None] for c in self._descriptors(df, scaled=True)]
         return np.hstack(cols) if cols else np.zeros((len(df), 0))
+
+    def descriptor_names(self) -> list[str]:
+        return [f"{v.name}.{d}" for v in self.variables for d in sorted(v.descriptors)]
 
     def numeric_names(self) -> list[str]:
         names = []
@@ -135,7 +154,10 @@ class FeatureEncoder:
                 names.append(v.name)
             else:
                 names.extend(f"{v.name}={c}" for c in v.categories)
-        return names
+        return names + self.descriptor_names()
+
+    def coded_names(self) -> list[str]:
+        return [v.name for v in self.variables] + self.descriptor_names()
 
     def coded(self, df: pd.DataFrame) -> tuple[np.ndarray, list[int]]:
         cols, cat_idx = [], []
@@ -146,4 +168,5 @@ class FeatureEncoder:
                 lookup = {c: k for k, c in enumerate(v.categories)}
                 cols.append(df[v.name].astype(str).map(lookup).astype(float).to_numpy())
                 cat_idx.append(i)
+        cols += self._descriptors(df, scaled=False)
         return np.column_stack(cols), cat_idx

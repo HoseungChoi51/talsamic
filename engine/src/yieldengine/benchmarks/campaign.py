@@ -63,7 +63,7 @@ def run_campaign(bench: Benchmark, model: str, rounds: int = 8, batch: int = 8, 
 
     def record(r, secs):
         y = y_all[tested]
-        return {"benchmark": bench.name, "model": model, "seed": seed, "start": start, "risk": risk,
+        return {"benchmark": bench.name, "model": model + bench.name_suffix, "seed": seed, "start": start, "risk": risk,
                 "round": r, "n_runs": int(tested.sum()), "best": float(y.max()),
                 "gap_to_best": float(y_all.max() - y.max()), "top1pct_found": int((tested & top).sum()),
                 "top1pct_total": int(top.sum()), "seconds": secs}
@@ -101,13 +101,14 @@ def main(argv=None) -> None:
     ap.add_argument("--device", default="auto")
     ap.add_argument("--n-bootstrap", type=int, default=4)
     ap.add_argument("--out", default="results/campaign.csv")
+    ap.add_argument("--descriptors", help="folder of LLM descriptor tables (<benchmark>.json)")
     a = ap.parse_args(argv)
 
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     finals = []
     for bname in a.benchmarks:
-        bench = load(bname)
+        bench = load(bname, a.descriptors)
         for m in a.models:
             kw = {} if m == "random" else ({"n_restarts": 0} if m == "gp" else
                                            {"device": a.device, "n_bootstrap": a.n_bootstrap})

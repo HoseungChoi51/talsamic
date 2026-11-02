@@ -48,6 +48,7 @@ class Benchmark:
     splits: dict[str, tuple[np.ndarray, np.ndarray]]  # split name -> (train rows, test rows)
     smiles: dict[str, dict[str, str]] = field(default_factory=dict)  # variable -> {category -> SMILES}
     description: str = ""
+    name_suffix: str = ""  # "+llm" when LLM descriptors are attached
 
     def split(self, name: str) -> tuple[pd.DataFrame, pd.DataFrame]:
         tr, te = self.splits[name]
@@ -229,5 +230,14 @@ def direct_arylation() -> Benchmark:
 LOADERS = {"buchwald_hartwig": buchwald_hartwig, "suzuki": suzuki, "direct_arylation": direct_arylation}
 
 
-def load(name: str) -> Benchmark:
-    return LOADERS[name]()
+def load(name: str, descriptors: str | Path | None = None) -> Benchmark:
+    """Load a benchmark; with ``descriptors`` (a folder of LLM descriptor tables named
+    <benchmark>.json), its categorical conditions also carry those descriptors."""
+    bench = LOADERS[name]()
+    if descriptors:
+        from ..llm.descriptors import attach, load_tables
+
+        path = Path(descriptors) / f"{name}.json"
+        bench.schema = attach(bench.schema, load_tables(path))
+        bench.name_suffix = "+llm"
+    return bench

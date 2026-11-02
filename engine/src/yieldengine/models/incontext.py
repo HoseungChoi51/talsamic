@@ -58,7 +58,7 @@ class InContextSurrogate:
         self.schema = schema
         self.encoder = FeatureEncoder(schema)
         self.cat_idx = [i for i, v in enumerate(self.encoder.variables) if not v.is_continuous]
-        self.columns = [v.name for v in self.encoder.variables]
+        self.columns = self.encoder.coded_names()
         self.n_bootstrap = n_bootstrap
         self.n_folds = n_folds
         self.seed = seed
@@ -79,7 +79,7 @@ class InContextSurrogate:
     def frame(self, X: np.ndarray) -> pd.DataFrame:
         """Coded matrix -> DataFrame with categorical columns as pandas categories."""
         df = pd.DataFrame(X, columns=self.columns)
-        for i in self.cat_idx:
+        for i in self.cat_idx:  # categorical columns come first, in variable order
             v = self.encoder.variables[i]
             df[v.name] = pd.Categorical(df[v.name].round().astype(int), categories=range(len(v.categories)))
         return df
