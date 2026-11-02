@@ -57,8 +57,9 @@ that license, pass `model="limix-16m"` (its license may allow commercial use; th
 still need checking) or `model="gp"`.
 
 Why TabFM: with the LLM descriptors and the new-chemical guard, it found 8.75 of the 40
-best Buchwald–Hartwig recipes in 74 runs (GP 4.0, LimiX 4.75) and reached about 99% on
-direct arylation. On 100-run data it predicts about as well as LimiX.
+best Buchwald–Hartwig recipes in 74 runs (GP 4.0, LimiX 6.25) and reached about 99% on
+direct arylation. On 100-run data it predicts about as well as LimiX (mean R² 0.57 vs
+0.58). Suzuki is its weak spot: the GP got closer to the best recipe there (98.7 vs 97.6).
 
 The foundation models are in-context models: past runs are the context and candidates
 are the queries, scored in one forward pass. They return point predictions for
