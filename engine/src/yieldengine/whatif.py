@@ -20,7 +20,10 @@ from .schema import Schema
 def predict_recipe(model: Surrogate, recipe: dict[str, Any], context: dict[str, Any] | None = None) -> dict:
     p = model.predict(pd.DataFrame([{**recipe, **(context or {})}]))
     lo, hi = p.interval(0.8)
-    return {"predicted": round(float(p.mean[0]), 1), "low": round(float(lo[0]), 1), "high": round(float(hi[0]), 1)}
+    out = {"predicted": round(float(p.mean[0]), 1), "low": round(float(lo[0]), 1), "high": round(float(hi[0]), 1)}
+    if p.novel is not None and p.novel[0]:
+        out["new_conditions"] = list(p.novel[0])  # the UI marks the prediction as a guess
+    return out
 
 
 def slider_curves(

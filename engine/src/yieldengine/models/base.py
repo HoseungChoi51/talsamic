@@ -18,10 +18,14 @@ from ..schema import Schema
 
 @dataclass
 class Prediction:
-    """Predicted yield as a normal distribution per row."""
+    """Predicted yield as a normal distribution per row.
+
+    ``novel``: per row, the conditions whose value the past runs never used (set by
+    ``novelty.NoveltyGuard``; None when no guard ran). Those predictions are guesses."""
 
     mean: np.ndarray
     sd: np.ndarray
+    novel: list[tuple[str, ...]] | None = None
 
     def quantile(self, q: float) -> np.ndarray:
         return self.mean + norm.ppf(q) * self.sd

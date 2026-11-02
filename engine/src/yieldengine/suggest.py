@@ -296,7 +296,7 @@ def suggest_batch(
         desc = _describe_changes(schema, _changes(schema, recipe, standard))
         reason = (f"{desc}: 예상 수율 {facts['predicted']}% (범위 {facts['low']}–{facts['high']}%), "
                   f"표준보다 {facts['vs_standard_pp']:+.1f}%p. "
-                  f"모험 정도 '{risk.label}' 설정으로 고른 조건이다.")
+                  f"모험 정도 '{risk.label}' 설정으로 고른 조건이다.") + _novel_note(schema, pred, i, facts)
         add(OPTIMIZE, recipe, pred.mean[i], lo80[i], hi80[i], facts, reason)
 
     # ---- learn runs ---------------------------------------------------------------
@@ -322,7 +322,7 @@ def suggest_batch(
             facts = {"predicted": round(float(pred.mean[i]), 1), "low": round(float(lo80[i]), 1),
                      "high": round(float(hi80[i]), 1), "half_width": half}
             reason = (f"이 조건 근처는 데이터가 적어 예측 범위가 넓다 (±{half}%p). "
-                      f"결과가 모델을 가장 많이 바로잡을 수 있는 실험이다.")
+                      f"결과가 모델을 가장 많이 바로잡을 수 있는 실험이다.") + _novel_note(schema, pred, i, facts)
             add(LEARN, recipe, pred.mean[i], lo80[i], hi80[i], facts, reason)
 
     # ---- reference run --------------------------------------------------------------
@@ -334,7 +334,7 @@ def suggest_batch(
         rlo, rhi = rp.interval(0.8)
         facts = {"predicted": round(float(rp.mean[0]), 1), "low": round(float(rlo[0]), 1),
                  "high": round(float(rhi[0]), 1)}
-        reason = "매주 같은 표준 조건으로 돌려서 설비나 원료가 변했는지 확인한다."
+        reason = "매주 같은 표준 조건으로 돌려서 설비나 원료가 변했는지 확인한다." + _novel_note(schema, rp, 0, facts)
         if moved:
             reason += " 고정 조건 때문에 표준과 다른 부분이 있어 지난 기준 실험과 직접 비교하기 어렵다."
         add(REFERENCE, recipe, rp.mean[0], rlo[0], rhi[0], facts, reason)
@@ -345,6 +345,17 @@ def suggest_batch(
                      f"(요청 {settings.n_runs}건). 제한을 풀거나 한 번에 바꿀 조건 수를 늘리면 더 나온다.")
     return Batch(uuid4().hex[:8], datetime.now(timezone.utc).isoformat(timespec="seconds"),
                  getattr(model, "name", type(model).__name__), settings, context, suggestions, notes)
+
+
+def _novel_note(schema: Schema, pred: Prediction, i: int, facts: dict) -> str:
+    """Say so when a recipe uses a value the past runs never used (see ``novelty.py``)."""
+    names = pred.novel[i] if pred.novel is not None else ()
+    if not names:
+        return ""
+    facts["new_conditions"] = list(names)
+    labels = ", ".join(schema[n].label for n in names)
+    return (f" 처음 써 보는 조건({labels})이 있어 예상 수율은 추정이다. "
+            f"범위는 지난 데이터에서 새 값을 예측했을 때 틀린 만큼 넓혔다.")
 
 
 def _disentangle_runs(schema: Schema, data: pd.DataFrame, settings: BatchSettings, base: dict):

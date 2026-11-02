@@ -112,6 +112,12 @@ class InContextSurrogate:
             self._noise_sd = float(np.std(self._y)) * 0.5
         return self
 
+    def point_predict(self, train: pd.DataFrame, rows: pd.DataFrame) -> np.ndarray:
+        """Point predictions from one pass with ``train`` as the context, no refit or bootstrap."""
+        Xc, _ = self.encoder.coded(train)
+        Xq, _ = self.encoder.coded(rows)
+        return self._pass(Xc, train[self.schema.target.name].to_numpy(float), Xq)
+
     def predict(self, rows: pd.DataFrame) -> Prediction:
         assert self._X is not None, "call fit first"
         Xq, _ = self.encoder.coded(rows)

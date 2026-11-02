@@ -21,6 +21,7 @@ from .analysis import Finding, discover
 from .calibration import fit_calibrated
 from .cleaning import flag_suspect_values
 from .models import DEFAULT_MODEL, model_factory
+from .novelty import guarded
 from .schema import Schema
 from .suggest import Batch, BatchSettings, suggest_batch
 from .tracking import compare_with_actuals
@@ -32,7 +33,8 @@ class Engine:
                  context: dict[str, Any] | None = None, **model_kw):
         self.data = data.reset_index(drop=True)
         self.schema = schema
-        self.factory = model_factory(schema, model, **model_kw)
+        # every prediction flags recipes with a value the past runs never used (novelty.py)
+        self.factory = guarded(model_factory(schema, model, **model_kw), schema)
         self.context = context if context is not None else self._latest_context()
 
     def _latest_context(self) -> dict[str, Any]:

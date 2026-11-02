@@ -66,6 +66,22 @@ aren't available, it falls back to the GP and gives the reason in
 later blocks (rolling origin). If the 80% ranges cover less than 80% of those runs,
 every range is widened by the same factor. Ranges are never narrowed.
 
+**New-chemical guard** (`novelty.py`). A model learns what a ligand, base or catalyst
+does only from runs that used it, so a recipe with a value the past runs never used is
+a guess. In the benchmarks the foundation models were overconfident there: with
+held-out ligands, their 80% ranges covered as little as 13% of the actual yields. The
+`Engine` wraps every model in `NoveltyGuard`, which
+
+- lists the new conditions per row in `Prediction.novel`, `predict_recipe(...)["new_conditions"]`
+  and `Suggestion.facts["new_conditions"]`, and adds a sentence to the suggestion's reason;
+- widens those rows' ranges to at least the error measured by holding out one value at
+  a time from the past runs (leave-one-value-out). With fewer than two values tried, it
+  uses the spread of all past yields;
+- leaves the predicted mean alone. Only set-before conditions are checked; a new
+  raw-material lot is the drift analysis's job.
+
+Benchmarks take `--guard` to compare with and without it.
+
 ## 발견: what is computed
 
 | Finding | How | Example sentence (fake data) |
@@ -140,3 +156,5 @@ python -m yieldengine.benchmarks.campaign --models random gp exaone-tabular --st
 ```
 
 The GP baseline is limited to 500 training rows, because exact GP gets slow fast.
+The prediction results split coverage into test rows with a value the training rows
+never used (`coverage80_new`) and the rest (`coverage80_seen`).

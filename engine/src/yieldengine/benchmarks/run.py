@@ -31,7 +31,9 @@ def main(argv=None) -> None:
     ap.add_argument("--out", default="results/prediction.csv")
     ap.add_argument("--skip-done", action="store_true")
     ap.add_argument("--descriptors", help="folder of LLM descriptor tables (<benchmark>.json)")
+    ap.add_argument("--guard", action="store_true", help="wrap models in the new-chemical guard (novelty.py)")
     a = ap.parse_args(argv)
+    tag = "+guard" if a.guard else ""
 
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -46,14 +48,14 @@ def main(argv=None) -> None:
             if split not in bench.splits:
                 continue
             for m in a.models:
-                if (bname, split, m + bench.name_suffix) in done:
+                if (bname, split, m + bench.name_suffix + tag) in done:
                     continue
                 kw = {"n_restarts": 0} if m == "gp" else {"device": a.device, "n_bootstrap": a.n_bootstrap}
                 try:
-                    r = evaluate(bench, split, m, max_context=a.max_context, **kw)
+                    r = evaluate(bench, split, m, max_context=a.max_context, guard=a.guard, **kw)
                 except Exception as e:
                     traceback.print_exc()
-                    r = {"benchmark": bname, "split": split, "model": m, "note": f"ERROR {type(e).__name__}: {e}"}
+                    r = {"benchmark": bname, "split": split, "model": m + bench.name_suffix + tag, "note": f"ERROR {type(e).__name__}: {e}"}
                 print({k: (round(v, 3) if isinstance(v, float) else v) for k, v in r.items()}, flush=True)
                 rows.append(r)
                 pd.DataFrame([r]).to_csv(out, mode="a", header=not out.exists(), index=False)

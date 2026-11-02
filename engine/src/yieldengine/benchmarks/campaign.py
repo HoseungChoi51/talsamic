@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 
 from ..models import MODELS, model_factory
+from ..novelty import guarded
 from ..suggest import BatchSettings, suggest_batch
 from .datasets import LOADERS, Benchmark, load
 
@@ -42,7 +43,7 @@ def _initial(pool: pd.DataFrame, n: int, start: str, rng) -> np.ndarray:
 
 def run_campaign(bench: Benchmark, model: str, rounds: int = 8, batch: int = 8, learn: int = 2,
                  n_init: int = 10, start: str = "random", risk: str = "균형", radius: float | None = None,
-                 seed: int = 0, **model_kw) -> pd.DataFrame:
+                 seed: int = 0, guard: bool = False, **model_kw) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
     pool = _pool(bench)
     cols = [v.name for v in bench.schema.controls]
@@ -58,12 +59,15 @@ def run_campaign(bench: Benchmark, model: str, rounds: int = 8, batch: int = 8, 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             factory = model_factory(bench.schema, model, fallback=None, **model_kw)
+            if guard:
+                factory = guarded(factory, bench.schema)
     settings = BatchSettings(risk=risk, n_runs=batch, split=(batch - learn, learn, 0),
                              max_changes=len(cols), radius=radius, seed=seed)
 
     def record(r, secs):
         y = y_all[tested]
-        return {"benchmark": bench.name, "model": model + bench.name_suffix, "seed": seed, "start": start, "risk": risk,
+        label = model + bench.name_suffix + ("+guard" if guard and model != "random" else "")
+        return {"benchmark": bench.name, "model": label, "seed": seed, "start": start, "risk": risk,
                 "round": r, "n_runs": int(tested.sum()), "best": float(y.max()),
                 "gap_to_best": float(y_all.max() - y.max()), "top1pct_found": int((tested & top).sum()),
                 "top1pct_total": int(top.sum()), "seconds": secs}
@@ -102,6 +106,7 @@ def main(argv=None) -> None:
     ap.add_argument("--n-bootstrap", type=int, default=4)
     ap.add_argument("--out", default="results/campaign.csv")
     ap.add_argument("--descriptors", help="folder of LLM descriptor tables (<benchmark>.json)")
+    ap.add_argument("--guard", action="store_true", help="wrap models in the new-chemical guard (novelty.py)")
     a = ap.parse_args(argv)
 
     out = Path(a.out)
@@ -115,7 +120,7 @@ def main(argv=None) -> None:
             for seed in a.seeds:
                 try:
                     df = run_campaign(bench, m, a.rounds, a.batch, a.learn, a.n_init, a.start, a.risk,
-                                      a.radius, seed, **kw)
+                                      a.radius, seed, guard=a.guard, **kw)
                 except Exception as e:
                     traceback.print_exc()
                     print(f"{bname} {m} seed {seed}: ERROR {type(e).__name__}: {e}", flush=True)

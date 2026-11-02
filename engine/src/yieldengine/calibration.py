@@ -73,7 +73,7 @@ class CalibratedModel:
 
     def predict(self, rows: pd.DataFrame) -> Prediction:
         p = self.base.predict(rows)
-        return Prediction(p.mean, p.sd * self.factor)
+        return Prediction(p.mean, p.sd * self.factor, p.novel)
 
 
 def fit_calibrated(factory: ModelFactory, data: pd.DataFrame, schema: Schema, coverage: float = 0.8):
