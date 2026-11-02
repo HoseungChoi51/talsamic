@@ -117,7 +117,12 @@ class MitraSurrogate(InContextSurrogate):
 
 
 class TabLDMSurrogate(InContextSurrogate):
-    """Xiaomi-TabLDM (occams/Xiaomi-TabLDM). sklearn-style regressor."""
+    """Xiaomi-TabLDM, sklearn-style regressor, per its model card.
+
+    Not usable as of 2026-11-02: the Hugging Face repo (occams/Xiaomi-TabLDM, a personal
+    account) contains only a README and pickled .ckpt weights. There's no ``tabldm`` package
+    and no loader code to review. Unpickling unreviewed checkpoints can run arbitrary code,
+    so the weights are not loaded. The adapter is kept for when official code is published."""
 
     name = "tabldm"
     license = "Apache-2.0"
