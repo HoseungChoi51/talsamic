@@ -1,6 +1,6 @@
 """End-to-end demo on fake data: findings, a batch, run it on the fake plant, compare.
 
-    python -m yieldengine.demo [--model gp|limix-16m] [--risk 균형] [--out demo_out]
+    python -m yieldengine.demo [--model tabfm|limix-16m|gp] [--risk 균형] [--out demo_out]
 """
 
 from __future__ import annotations
@@ -11,6 +11,7 @@ import warnings
 import pandas as pd
 
 from .engine import Engine
+from .models import DEFAULT_MODEL
 from .simulator import FakePlant, default_schema
 from .suggest import BatchSettings
 from .tracking import save_batch
@@ -18,7 +19,7 @@ from .tracking import save_batch
 
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--model", default="limix-16m")
+    ap.add_argument("--model", default=DEFAULT_MODEL)
     ap.add_argument("--risk", default="균형", choices=["안전하게", "균형", "도전적으로"])
     ap.add_argument("--runs", type=int, default=12)
     ap.add_argument("--max-changes", type=int, default=2)
@@ -33,7 +34,9 @@ def main(argv: list[str] | None = None) -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         eng = Engine(history, schema, model=a.model, context=plant.context_now(history))
-    print(f"모델: {eng.model_name}" + (f"  (LimiX 사용 불가: {eng.fallback_reason})" if eng.fallback_reason else ""))
+    print(f"모델: {eng.model_name}" + (f"  (기본 모델 사용 불가: {eng.fallback_reason})" if eng.fallback_reason else ""))
+    if eng.license_note:
+        print(f"주의: {eng.license_note}")
     print(f"과거 실험 {len(history)}건, 예측 범위 보정 배율 {eng.model.factor:.2f}\n")
 
     print("== 발견 ==")

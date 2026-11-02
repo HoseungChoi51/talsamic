@@ -7,8 +7,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from yieldengine.models import (REGISTRY, EXAONETabularSurrogate, LimiXSurrogate, MitraSurrogate, ModelUnavailable,
-                                TabFMSurrogate, TabLDMSurrogate, model_factory, model_info)
+from yieldengine.models import (DEFAULT_MODEL, REGISTRY, EXAONETabularSurrogate, LimiXSurrogate, MitraSurrogate, ModelUnavailable,
+                                TabFMSurrogate, TabLDMSurrogate, license_note, model_factory, model_info)
 
 
 def _knn(Xc, yc, Xq, k=5):
@@ -152,6 +152,32 @@ def test_model_info_flags_noncommercial():
     assert set(info) == set(REGISTRY)
     assert info["exaone-tabular"]["commercial_use"] is False and info["tabfm"]["commercial_use"] is False
     assert info["mitra"]["commercial_use"] is True and info["gp"]["commercial_use"] is True
+
+
+def test_default_is_tabfm_with_a_license_note_and_gp_fallback(schema, history, monkeypatch):
+    from yieldengine.engine import Engine
+
+    assert DEFAULT_MODEL == "tabfm"
+    assert "비상업" in license_note("tabfm") and "TabFM" in license_note("tabfm")
+    assert "확인" in license_note("limix-16m")
+    assert license_note("gp") is None and license_note("mitra") is None
+
+    monkeypatch.delitem(sys.modules, "tabfm", raising=False)
+    monkeypatch.setattr("importlib.import_module", lambda n: (_ for _ in ()).throw(ImportError(n)))
+    with pytest.warns(UserWarning):
+        eng = Engine(history, schema)
+    assert eng.model_name == "gp" and "tabfm" in eng.fallback_reason
+    assert eng.license_note is None  # the GP that actually runs needs no license note
+
+
+def test_engine_shows_the_note_when_tabfm_runs(schema, history, monkeypatch):
+    from yieldengine.engine import Engine
+
+    loader = types.SimpleNamespace(load=lambda model_type, checkpoint_path, device: "weights")
+    _fake(monkeypatch, "tabfm", TabFMRegressor=SklearnStyle, tabfm_v1_1_0_pytorch=loader)
+    eng = Engine(history, schema, n_bootstrap=2)
+    assert eng.model_name == "tabfm" and eng.fallback_reason is None
+    assert eng.license_note == license_note("tabfm")
 
 
 def test_limix_cache_redirect_reaches_nested_class(monkeypatch, tmp_path):

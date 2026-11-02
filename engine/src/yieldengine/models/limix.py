@@ -1,4 +1,4 @@
-"""LimiX-16M adapter (default model).
+"""LimiX-16M adapter (the strongest model whose license may allow plant use).
 
 LimiX is an in-context model: ``fit`` only stores the past runs, and ``predict``
 scores every query row in one forward pass with those runs as context.
@@ -97,6 +97,7 @@ def _load_predictor(device: str, ckpt: str | None, config: str | None, categoric
 
 class LimiXSurrogate(InContextSurrogate):
     name = "limix-16m"
+    label = "LimiX-16M"
     license = "Stable AI Technology License (Apache-2.0 based, attribution and naming terms)"
     commercial_use = None
     install = "git clone https://github.com/limix-ldm-ai/LimiX && pip install -e LimiX"

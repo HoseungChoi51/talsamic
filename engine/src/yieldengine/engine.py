@@ -20,7 +20,7 @@ import pandas as pd
 from .analysis import Finding, discover
 from .calibration import fit_calibrated
 from .cleaning import flag_suspect_values
-from .models import DEFAULT_MODEL, model_factory
+from .models import DEFAULT_MODEL, license_note, model_factory
 from .novelty import guarded
 from .schema import Schema
 from .suggest import Batch, BatchSettings, suggest_batch
@@ -51,6 +51,11 @@ class Engine:
     @property
     def fallback_reason(self) -> str | None:
         return self.factory.fallback_reason
+
+    @property
+    def license_note(self) -> str | None:
+        """Shown next to the model name when its license may not allow plant use (TabFM, EXAONE)."""
+        return license_note(self.model_name)
 
     @cached_property
     def _fitted(self):

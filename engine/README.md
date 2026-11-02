@@ -44,20 +44,43 @@ and compares the results with the saved predictions.
 
 ## Models
 
-`model_factory(schema, "limix-16m")` is the default. If LimiX's code or weights
-aren't available, it falls back to the GP and gives the reason in
+TabFM 1.1 is the default (`DEFAULT_MODEL = "tabfm"`). `Engine(...)` and
+`model_factory(schema)` use it unless `model=` names another one. If its package or
+weights aren't available, the factory falls back to the GP and gives the reason in
 `factory.fallback_reason`. The demo prints that reason.
 
-- **LimiX-16M** (`models/limix.py`). This is an in-context model: past runs are the
-  context and candidates are the queries, scored in one forward pass. LimiX returns
-  point predictions for regression. The range combines the spread from bootstrap
-  resamples of the context with an out-of-fold error floor.
-  Setup:
+**License: read before plant use.** TabFM's weights are under the TabFM Non-Commercial
+License. Using it for real production work needs a license from Google. Until then,
+`Engine.license_note` returns a Korean sentence saying so, for the UI to show next to the
+model name (the demo prints it). It is `None` for the GP and Mitra. For a plant without
+that license, pass `model="limix-16m"` (its license may allow commercial use; the terms
+still need checking) or `model="gp"`.
+
+Why TabFM: with the LLM descriptors and the new-chemical guard, it found 8.75 of the 40
+best Buchwald–Hartwig recipes in 74 runs (GP 4.0, LimiX 4.75) and reached about 99% on
+direct arylation. On 100-run data it predicts about as well as LimiX.
+
+The foundation models are in-context models: past runs are the context and candidates
+are the queries, scored in one forward pass. They return point predictions for
+regression, so the range combines the spread from bootstrap resamples of the context
+with an out-of-fold error floor.
+
+- **TabFM 1.1** (`models/foundation.py`, default). Setup:
+  ```bash
+  pip install -e ".[tabfm]"    # tabfm[pytorch] + huggingface_hub
+  ```
+  The weights come from HF `google/tabfm-1.1.0-pytorch`. The tabfm package (1.0.1)
+  ships only the 1.0.0 loader, so the 1.1.0 weights load through it; if that fails, the
+  1.0.0 weights are used and `model.version` says so.
+- **LimiX-16M** (`models/limix.py`). The strongest model whose license may allow
+  commercial use. Setup:
   ```bash
   git clone https://github.com/limix-ldm-ai/LimiX && pip install -e LimiX
   export YIELDENGINE_LIMIX_CKPT=/path/to/LimiX-16M.ckpt   # else fetched from HF stable-ai/LimiX-1_16M
   export YIELDENGINE_LIMIX_CONFIG=/path/to/LimiX/config/reg_default_noretrieval.json
   ```
+- **EXAONE-Tabular** (non-commercial weights) and **Mitra** (Apache-2.0) are opt-in;
+  see `models/foundation.py`. `model_info()` lists every model's license and install line.
 - **GP** (`models/gp.py`). This is the baseline: a Matern ARD kernel with a noise
   term. It always runs.
 - Adding a model only requires `fit(df)` and `predict(df) -> Prediction(mean, sd)`.

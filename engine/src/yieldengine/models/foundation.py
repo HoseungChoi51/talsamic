@@ -12,8 +12,9 @@ Skipped on purpose:
   databases; one table of runs doesn't need it.
 
 Licenses matter for a tool that will run at a plant:
-EXAONE-Tabular and TabFM weights are non-commercial. Mitra and Xiaomi-TabLDM are
-Apache-2.0. LimiX-16M has its own Apache-based license.
+EXAONE-Tabular and TabFM weights are non-commercial, so TabFM (the default) needs a
+license from Google before production use. Mitra and Xiaomi-TabLDM are Apache-2.0.
+LimiX-16M has its own Apache-based license.
 """
 
 from __future__ import annotations
@@ -33,6 +34,7 @@ class EXAONETabularSurrogate(InContextSurrogate):
     as integer codes (the coded encoding already does that)."""
 
     name = "exaone-tabular"
+    label = "EXAONE-Tabular"
     license = "EXAONE AI Model License 1.2 - NC (weights); code BSD-3-Clause-LG"
     commercial_use = False
     install = 'pip install "exaonetabular @ git+https://github.com/LGAI-Research/EXAONE-Tabular.git"'
@@ -68,6 +70,7 @@ class TabFMSurrogate(InContextSurrogate):
     ``self.version`` says so."""
 
     name = "tabfm"
+    label = "TabFM 1.1"
     license = "TabFM Non-Commercial License v1.0 (weights); code Apache-2.0"
     commercial_use = False
     install = 'pip install "tabfm[pytorch]" huggingface_hub'

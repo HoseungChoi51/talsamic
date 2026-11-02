@@ -3,8 +3,11 @@
 ``model_factory`` returns a zero-argument callable that builds a fresh, unfitted
 model. Analyses refit on time splits many times, so they take a factory, not a model.
 Weights are loaded once by the factory and shared by every model it builds.
-The default is LimiX-16M; if a model's code or weights are missing, the factory falls
-back to the GP baseline and says why in ``factory.fallback_reason``.
+The default is TabFM 1.1, the strongest optimizer in the benchmarks. Its weights are
+non-commercial, so ``license_note`` gives the UI a sentence to show until the plant
+has a license (or picks ``limix-16m`` or ``gp``). If a model's code or weights are
+missing, the factory falls back to the GP baseline and says why in
+``factory.fallback_reason``.
 """
 
 from __future__ import annotations
@@ -19,7 +22,7 @@ from .gp import GPSurrogate
 from .incontext import InContextSurrogate
 from .limix import LimiXSurrogate
 
-DEFAULT_MODEL = "limix-16m"
+DEFAULT_MODEL = "tabfm"
 REGISTRY: dict[str, type] = {
     "limix-16m": LimiXSurrogate,
     "exaone-tabular": EXAONETabularSurrogate,
@@ -71,6 +74,18 @@ def model_info() -> list[dict]:
     return out
 
 
+def license_note(name: str) -> str | None:
+    """A Korean sentence for the UI when a model's license may not allow plant use, else None."""
+    cls = REGISTRY[name]
+    ok = getattr(cls, "commercial_use", True)
+    if ok:
+        return None
+    label = getattr(cls, "label", name)
+    if ok is None:
+        return f"{label}의 라이선스 조건은 아직 확인하지 않았다. 실제 생산에 쓰기 전에 확인이 필요하다."
+    return f"{label}의 가중치는 비상업 라이선스라서 실제 생산에 쓰려면 별도 라이선스가 필요하다."
+
+
 __all__ = ["DEFAULT_MODEL", "EXAONETabularSurrogate", "GPSurrogate", "InContextSurrogate", "LimiXSurrogate",
            "MODELS", "MitraSurrogate", "ModelFactory", "ModelUnavailable", "Prediction", "REGISTRY", "Surrogate",
-           "TabFMSurrogate", "TabLDMSurrogate", "model_factory", "model_info"]
+           "TabFMSurrogate", "TabLDMSurrogate", "license_note", "model_factory", "model_info"]
