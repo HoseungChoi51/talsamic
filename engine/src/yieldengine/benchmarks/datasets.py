@@ -169,23 +169,42 @@ def buchwald_hartwig() -> Benchmark:
 
 
 # -- Suzuki-Miyaura ---------------------------------------------------------------------
+# The file names ligands only by shorthand. Structures help the LLM: without them it took
+# AmPhos for a biaryl phosphine and CataCXium A (PAd2nBu) for a ferrocene bisphosphine.
+_AD = "C12CC3CC(CC(C3)C1)C2"  # 1-adamantyl
+_SZ_LIGANDS = {
+    "AmPhos": "CN(C)c1ccc(cc1)P(C(C)(C)C)C(C)(C)C",
+    "CataCXium A": f"CCCCP({_AD}){_AD}",
+    "P(Cy)3": "C1CCC(CC1)P(C1CCCCC1)C1CCCCC1",
+    "P(Ph)3": "c1ccc(cc1)P(c1ccccc1)c1ccccc1",
+    "P(o-Tol)3": "Cc1ccccc1P(c1ccccc1C)c1ccccc1C",
+    "P(tBu)3": "CC(C)(C)P(C(C)(C)C)C(C)(C)C",
+    "SPhos": "COc1cccc(OC)c1-c1ccccc1P(C1CCCCC1)C1CCCCC1",
+    "XPhos": "CC(C)c1cc(C(C)C)c(-c2ccccc2P(C2CCCCC2)C2CCCCC2)c(C(C)C)c1",
+    "Xantphos": "CC1(C)c2cccc(P(c3ccccc3)c3ccccc3)c2Oc2c(P(c3ccccc3)c3ccccc3)cccc21",
+    "dppf": "[Fe+2].c1ccc(cc1)P(c1ccccc1)[c-]1cccc1.c1ccc(cc1)P(c1ccccc1)[c-]1cccc1",
+    "dtbpf": "[Fe+2].CC(C)(C)P(C(C)(C)C)[c-]1cccc1.CC(C)(C)P(C(C)(C)C)[c-]1cccc1",
+}
+
+
 def suzuki() -> Benchmark:
     path = _fetch("suzuki")
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         raw = pd.read_excel(path, "Sheet1")
     df = pd.DataFrame({
-        "electrophile": raw["Reactant_1_Name"].astype(str),
-        "nucleophile": raw["Reactant_2_Name"].astype(str),
-        "ligand": raw["Ligand_Short_Hand"].fillna("None").astype(str),
-        "base": raw["Reagent_1_Short_Hand"].fillna("None").astype(str),
-        "solvent": raw["Solvent_1_Short_Hand"].fillna("None").astype(str),
+        # names are trimmed: the file has "P(Ph)3 " with a trailing space
+        "electrophile": raw["Reactant_1_Name"].astype(str).str.strip(),
+        "nucleophile": raw["Reactant_2_Name"].astype(str).str.strip(),
+        "ligand": raw["Ligand_Short_Hand"].fillna("None").astype(str).str.strip(),
+        "base": raw["Reagent_1_Short_Hand"].fillna("None").astype(str).str.strip(),
+        "solvent": raw["Solvent_1_Short_Hand"].fillna("None").astype(str).str.strip(),
         "yield": raw["Product_Yield_PCT_Area_UV"].astype(float).clip(0, 100),
     })
     schema = _schema(df, {"electrophile": "친전자체", "nucleophile": "친핵체", "ligand": "리간드",
                           "base": "염기", "solvent": "용매"}, {})
     splits = {**_standard_splits(df), **_group_out(df, "ligand", 4)}
-    return Benchmark("suzuki", df, schema, splits, {}, "Perera 2018 Suzuki-Miyaura, 5760 reactions")
+    return Benchmark("suzuki", df, schema, splits, {"ligand": _SZ_LIGANDS}, "Perera 2018 Suzuki-Miyaura, 5760 reactions")
 
 
 # -- Direct arylation (EDBO) ------------------------------------------------------------

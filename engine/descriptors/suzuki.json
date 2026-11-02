@@ -1,0 +1,661 @@
+[
+  {
+    "variable": "electrophile",
+    "values": {
+      "halide_reactivity": {
+        "6-Bromoquinoline": 3.0,
+        "6-Iodoquinoline": 5.0,
+        "6-Quinolineboronic acid pinacol ester": null,
+        "6-chloroquinoline": 1.0,
+        "6-quinoline-boronic acid hydrochloride": null,
+        "6-triflatequinoline": 4.0,
+        "Potassium quinoline-6-trifluoroborate": null
+      },
+      "ring_electron_poor": {
+        "6-Bromoquinoline": 4.0,
+        "6-Iodoquinoline": 4.0,
+        "6-Quinolineboronic acid pinacol ester": 4.0,
+        "6-chloroquinoline": 4.0,
+        "6-quinoline-boronic acid hydrochloride": 5.0,
+        "6-triflatequinoline": 5.0,
+        "Potassium quinoline-6-trifluoroborate": 4.0
+      },
+      "heteroaryl": {
+        "6-Bromoquinoline": 1.0,
+        "6-Iodoquinoline": 1.0,
+        "6-Quinolineboronic acid pinacol ester": 1.0,
+        "6-chloroquinoline": 1.0,
+        "6-quinoline-boronic acid hydrochloride": 1.0,
+        "6-triflatequinoline": 1.0,
+        "Potassium quinoline-6-trifluoroborate": 1.0
+      },
+      "n_adjacent_to_halide": {
+        "6-Bromoquinoline": 0.0,
+        "6-Iodoquinoline": 0.0,
+        "6-Quinolineboronic acid pinacol ester": 0.0,
+        "6-chloroquinoline": 0.0,
+        "6-quinoline-boronic acid hydrochloride": 0.0,
+        "6-triflatequinoline": 0.0,
+        "Potassium quinoline-6-trifluoroborate": 0.0
+      }
+    },
+    "spread": {
+      "halide_reactivity": {
+        "6-Bromoquinoline": 0.0,
+        "6-Iodoquinoline": 0.0,
+        "6-Quinolineboronic acid pinacol ester": null,
+        "6-chloroquinoline": 0.0,
+        "6-quinoline-boronic acid hydrochloride": null,
+        "6-triflatequinoline": 1.0,
+        "Potassium quinoline-6-trifluoroborate": null
+      },
+      "ring_electron_poor": {
+        "6-Bromoquinoline": 1.0,
+        "6-Iodoquinoline": 1.0,
+        "6-Quinolineboronic acid pinacol ester": 1.0,
+        "6-chloroquinoline": 1.0,
+        "6-quinoline-boronic acid hydrochloride": 0.0,
+        "6-triflatequinoline": 0.0,
+        "Potassium quinoline-6-trifluoroborate": 1.0
+      },
+      "heteroaryl": {
+        "6-Bromoquinoline": 0.0,
+        "6-Iodoquinoline": 0.0,
+        "6-Quinolineboronic acid pinacol ester": 0.0,
+        "6-chloroquinoline": 0.0,
+        "6-quinoline-boronic acid hydrochloride": 0.0,
+        "6-triflatequinoline": 0.0,
+        "Potassium quinoline-6-trifluoroborate": 0.0
+      },
+      "n_adjacent_to_halide": {
+        "6-Bromoquinoline": 0.0,
+        "6-Iodoquinoline": 0.0,
+        "6-Quinolineboronic acid pinacol ester": 0.0,
+        "6-chloroquinoline": 0.0,
+        "6-quinoline-boronic acid hydrochloride": 0.0,
+        "6-triflatequinoline": 0.0,
+        "Potassium quinoline-6-trifluoroborate": 0.0
+      }
+    },
+    "spec": [
+      {
+        "name": "halide_reactivity",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "ease of oxidative addition: Cl 1, Br 3, I 5"
+      },
+      {
+        "name": "ring_electron_poor",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "1 electron-rich ring (anisole) to 5 electron-poor (CF3-arene, pyridine)"
+      },
+      {
+        "name": "heteroaryl",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if the ring is a heteroarene, else 0"
+      },
+      {
+        "name": "n_adjacent_to_halide",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if a ring nitrogen sits next to the C-X carbon, else 0"
+      }
+    ],
+    "model": "qwen3.8-flash-next",
+    "n_samples": 3,
+    "issues": [],
+    "notes": [
+      "Triflate reactivity was estimated as a pseudohalide between bromide and iodide, while boron-containing options lack an aryl halide/pseudohalide for oxidative addition.",
+      "Triflate was treated as a pseudohalide with intermediate oxidative-addition reactivity, while organoboron reagents lack an aryl C-X bond so halide_reactivity is null.",
+      "Triflate was treated as a highly reactive pseudohalide, and 6-substituted quinolines place the leaving group away from the ring nitrogen."
+    ],
+    "created_at": "2026-11-02T14:24:56+00:00",
+    "confirmed_by": null
+  },
+  {
+    "variable": "nucleophile",
+    "values": {
+      "reactivity": {
+        "2a, Boronic Acid": 4.0,
+        "2b, Boronic Ester": 3.0,
+        "2c, Trifluoroborate": 3.0,
+        "2d, Bromide": 1.0
+      },
+      "steric_bulk": {
+        "2a, Boronic Acid": 2.0,
+        "2b, Boronic Ester": 3.0,
+        "2c, Trifluoroborate": 3.0,
+        "2d, Bromide": 2.0
+      },
+      "polarity": {
+        "2a, Boronic Acid": 4.0,
+        "2b, Boronic Ester": 2.0,
+        "2c, Trifluoroborate": 5.0,
+        "2d, Bromide": 5.0
+      }
+    },
+    "spread": {
+      "reactivity": {
+        "2a, Boronic Acid": 1.0,
+        "2b, Boronic Ester": 0.0,
+        "2c, Trifluoroborate": 0.0,
+        "2d, Bromide": 3.0
+      },
+      "steric_bulk": {
+        "2a, Boronic Acid": 0.0,
+        "2b, Boronic Ester": 0.0,
+        "2c, Trifluoroborate": 1.0,
+        "2d, Bromide": 0.0
+      },
+      "polarity": {
+        "2a, Boronic Acid": 0.0,
+        "2b, Boronic Ester": 1.0,
+        "2c, Trifluoroborate": 0.0,
+        "2d, Bromide": 3.0
+      }
+    },
+    "spec": [
+      {
+        "name": "reactivity",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "general reactivity in this reaction: 1 low to 5 high"
+      },
+      {
+        "name": "steric_bulk",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "1 small to 5 very bulky"
+      },
+      {
+        "name": "polarity",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "1 non-polar to 5 very polar"
+      }
+    ],
+    "model": "qwen3.8-flash-next",
+    "n_samples": 3,
+    "issues": [],
+    "notes": [
+      "Bromide is not a typical Suzuki-Miyaura nucleophile, so its reactivity was estimated as very low if treated as a nucleophile.",
+      "Bromide is typically the electrophile rather than the nucleophile in Suzuki–Miyaura couplings, so its nucleophile-specific reactivity is uncertain.",
+      "Bromide is not a typical Suzuki-Miyaura nucleophile, so its reactivity was estimated as low and its polarity as ionic."
+    ],
+    "created_at": "2026-11-02T14:31:13+00:00",
+    "confirmed_by": null
+  },
+  {
+    "variable": "ligand",
+    "values": {
+      "steric_bulk": {
+        "AmPhos": 4.0,
+        "CataCXium A": 5.0,
+        "None": null,
+        "P(Cy)3": 4.0,
+        "P(Ph)3 ": null,
+        "P(o-Tol)3": 4.0,
+        "P(tBu)3": 5.0,
+        "SPhos": 4.0,
+        "XPhos": 5.0,
+        "Xantphos": 4.0,
+        "dppf": 3.0,
+        "dtbpf": 5.0
+      },
+      "electron_richness": {
+        "AmPhos": 5.0,
+        "CataCXium A": 5.0,
+        "None": null,
+        "P(Cy)3": 5.0,
+        "P(Ph)3 ": null,
+        "P(o-Tol)3": 3.0,
+        "P(tBu)3": 5.0,
+        "SPhos": 5.0,
+        "XPhos": 5.0,
+        "Xantphos": 2.0,
+        "dppf": 3.0,
+        "dtbpf": 5.0
+      },
+      "cone_angle_deg": {
+        "AmPhos": 191.0,
+        "CataCXium A": 205.0,
+        "None": null,
+        "P(Cy)3": 170.0,
+        "P(Ph)3 ": null,
+        "P(o-Tol)3": 194.0,
+        "P(tBu)3": 182.0,
+        "SPhos": 191.0,
+        "XPhos": 206.0,
+        "Xantphos": 180.0,
+        "dppf": 145.0,
+        "dtbpf": 182.0
+      },
+      "biaryl_phosphine": {
+        "AmPhos": 1.0,
+        "CataCXium A": 1.0,
+        "None": 0.0,
+        "P(Cy)3": 0.0,
+        "P(Ph)3 ": null,
+        "P(o-Tol)3": 0.0,
+        "P(tBu)3": 0.0,
+        "SPhos": 1.0,
+        "XPhos": 1.0,
+        "Xantphos": 0.0,
+        "dppf": 0.0,
+        "dtbpf": 0.0
+      },
+      "bidentate": {
+        "AmPhos": 0.0,
+        "CataCXium A": 0.0,
+        "None": 0.0,
+        "P(Cy)3": 0.0,
+        "P(Ph)3 ": null,
+        "P(o-Tol)3": 0.0,
+        "P(tBu)3": 0.0,
+        "SPhos": 0.0,
+        "XPhos": 0.0,
+        "Xantphos": 1.0,
+        "dppf": 1.0,
+        "dtbpf": 1.0
+      }
+    },
+    "spread": {
+      "steric_bulk": {
+        "AmPhos": 1.0,
+        "CataCXium A": 1.0,
+        "None": null,
+        "P(Cy)3": 0.0,
+        "P(Ph)3 ": null,
+        "P(o-Tol)3": 1.0,
+        "P(tBu)3": 0.0,
+        "SPhos": 1.0,
+        "XPhos": 0.0,
+        "Xantphos": 0.0,
+        "dppf": 0.0,
+        "dtbpf": 0.0
+      },
+      "electron_richness": {
+        "AmPhos": 1.0,
+        "CataCXium A": 0.0,
+        "None": null,
+        "P(Cy)3": 0.0,
+        "P(Ph)3 ": null,
+        "P(o-Tol)3": 2.0,
+        "P(tBu)3": 0.0,
+        "SPhos": 1.0,
+        "XPhos": 1.0,
+        "Xantphos": 1.0,
+        "dppf": 1.0,
+        "dtbpf": 0.0
+      },
+      "cone_angle_deg": {
+        "AmPhos": 10.0,
+        "CataCXium A": 36.0,
+        "None": null,
+        "P(Cy)3": 0.0,
+        "P(Ph)3 ": null,
+        "P(o-Tol)3": 0.0,
+        "P(tBu)3": 0.0,
+        "SPhos": 9.0,
+        "XPhos": 6.0,
+        "Xantphos": 30.0,
+        "dppf": 15.0,
+        "dtbpf": 18.0
+      },
+      "biaryl_phosphine": {
+        "AmPhos": 0.0,
+        "CataCXium A": 1.0,
+        "None": 0.0,
+        "P(Cy)3": 0.0,
+        "P(Ph)3 ": null,
+        "P(o-Tol)3": 0.0,
+        "P(tBu)3": 0.0,
+        "SPhos": 0.0,
+        "XPhos": 0.0,
+        "Xantphos": 0.0,
+        "dppf": 0.0,
+        "dtbpf": 0.0
+      },
+      "bidentate": {
+        "AmPhos": 0.0,
+        "CataCXium A": 1.0,
+        "None": 0.0,
+        "P(Cy)3": 0.0,
+        "P(Ph)3 ": null,
+        "P(o-Tol)3": 0.0,
+        "P(tBu)3": 0.0,
+        "SPhos": 0.0,
+        "XPhos": 0.0,
+        "Xantphos": 0.0,
+        "dppf": 0.0,
+        "dtbpf": 0.0
+      }
+    },
+    "spec": [
+      {
+        "name": "steric_bulk",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "bulk around the metal: 1 small (PMe3) to 5 very bulky (P(tBu)3, AdBrettPhos)"
+      },
+      {
+        "name": "electron_richness",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "sigma-donor strength: 1 poor (P(2-furyl)3) to 5 very rich (P(tBu)3, PCy3)"
+      },
+      {
+        "name": "cone_angle_deg",
+        "lower": 100,
+        "upper": 220,
+        "meaning": "Tolman cone angle estimate in degrees"
+      },
+      {
+        "name": "biaryl_phosphine",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if a Buchwald-type dialkylbiaryl phosphine, else 0"
+      },
+      {
+        "name": "bidentate",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if it binds through two donor atoms, else 0"
+      }
+    ],
+    "model": "qwen3.8-flash-next",
+    "n_samples": 3,
+    "issues": [
+      "sample 0: no values for P(Ph)3 ",
+      "sample 1: no values for P(Ph)3 ",
+      "sample 2: no values for P(Ph)3 "
+    ],
+    "notes": [
+      "Cone angles for bidentate ligands are effective steric estimates rather than strict monodentate Tolman cone angles.",
+      "Cone angles for bidentate ligands are approximate effective estimates, and None has no applicable ligand descriptors.",
+      "CataCXium A was treated as a ferrocene bisphosphine, and None has null numeric descriptors because no ligand is present."
+    ],
+    "created_at": "2026-11-02T14:53:09+00:00",
+    "confirmed_by": null
+  },
+  {
+    "variable": "base",
+    "values": {
+      "pka_conjugate_acid": {
+        "CsF": 15.0,
+        "Et3N": 9.0,
+        "K3PO4": 17.0,
+        "KOH": 31.4,
+        "LiOtBu": 32.2,
+        "NaHCO3": 10.5,
+        "NaOH": 31.4,
+        "None": null
+      },
+      "strength": {
+        "CsF": 2.0,
+        "Et3N": 2.0,
+        "K3PO4": 3.0,
+        "KOH": 4.0,
+        "LiOtBu": 5.0,
+        "NaHCO3": 1.0,
+        "NaOH": 4.0,
+        "None": null
+      },
+      "organic": {
+        "CsF": 0.0,
+        "Et3N": 1.0,
+        "K3PO4": 0.0,
+        "KOH": 0.0,
+        "LiOtBu": 0.0,
+        "NaHCO3": 0.0,
+        "NaOH": 0.0,
+        "None": 0.0
+      },
+      "cation_size": {
+        "CsF": 5.0,
+        "Et3N": 0.0,
+        "K3PO4": 3.0,
+        "KOH": 3.0,
+        "LiOtBu": 1.0,
+        "NaHCO3": 2.0,
+        "NaOH": 2.0,
+        "None": 0.0
+      },
+      "steric_bulk": {
+        "CsF": 1.0,
+        "Et3N": 3.0,
+        "K3PO4": 2.0,
+        "KOH": 1.0,
+        "LiOtBu": 5.0,
+        "NaHCO3": 1.0,
+        "NaOH": 1.0,
+        "None": null
+      }
+    },
+    "spread": {
+      "pka_conjugate_acid": {
+        "CsF": 0.0,
+        "Et3N": 0.0,
+        "K3PO4": 9.7,
+        "KOH": 0.0,
+        "LiOtBu": 0.0,
+        "NaHCO3": 0.5,
+        "NaOH": 0.0,
+        "None": null
+      },
+      "strength": {
+        "CsF": 0.0,
+        "Et3N": 1.0,
+        "K3PO4": 0.0,
+        "KOH": 1.0,
+        "LiOtBu": 0.0,
+        "NaHCO3": 0.0,
+        "NaOH": 1.0,
+        "None": null
+      },
+      "organic": {
+        "CsF": 0.0,
+        "Et3N": 0.0,
+        "K3PO4": 0.0,
+        "KOH": 0.0,
+        "LiOtBu": 0.0,
+        "NaHCO3": 0.0,
+        "NaOH": 0.0,
+        "None": 0.0
+      },
+      "cation_size": {
+        "CsF": 0.0,
+        "Et3N": 0.0,
+        "K3PO4": 0.0,
+        "KOH": 0.0,
+        "LiOtBu": 0.0,
+        "NaHCO3": 0.0,
+        "NaOH": 0.0,
+        "None": 0.0
+      },
+      "steric_bulk": {
+        "CsF": 0.0,
+        "Et3N": 0.0,
+        "K3PO4": 0.0,
+        "KOH": 0.0,
+        "LiOtBu": 1.0,
+        "NaHCO3": 1.0,
+        "NaOH": 0.0,
+        "None": null
+      }
+    },
+    "spec": [
+      {
+        "name": "pka_conjugate_acid",
+        "lower": 0,
+        "upper": 40,
+        "meaning": "pKa of the conjugate acid in DMSO (estimate)"
+      },
+      {
+        "name": "strength",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "1 weak (acetate) to 5 very strong (alkoxide, phosphazene)"
+      },
+      {
+        "name": "organic",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if an organic (soluble, non-metal) base, else 0"
+      },
+      {
+        "name": "cation_size",
+        "lower": 0,
+        "upper": 5,
+        "meaning": "0 none/organic, 1 Li, 2 Na, 3 K, 4 Rb, 5 Cs"
+      },
+      {
+        "name": "steric_bulk",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "1 small to 5 very hindered"
+      }
+    ],
+    "model": "qwen3.8-flash-next",
+    "n_samples": 3,
+    "issues": [],
+    "notes": [
+      "DMSO pKa estimates for inorganic conjugate acids are approximate, and None uses null where the descriptor scale does not apply.",
+      "DMSO pKa values for inorganic conjugate acids such as HF, phosphate, and carbonate are approximate, and None has non-applicable numeric descriptors set to null.",
+      "DMSO pKa estimates for inorganic conjugate acids and base strength categories are approximate, especially for phosphate and carbonate."
+    ],
+    "created_at": "2026-11-02T15:02:07+00:00",
+    "confirmed_by": null
+  },
+  {
+    "variable": "solvent",
+    "values": {
+      "dielectric_constant": {
+        "DMF": 36.7,
+        "MeCN": 36.6,
+        "MeOH": 32.6,
+        "MeOH/H2O_V2 9:1": 37.0,
+        "THF": 7.6,
+        "THF_V2": 7.6
+      },
+      "boiling_point_c": {
+        "DMF": 153.0,
+        "MeCN": 82.0,
+        "MeOH": 65.0,
+        "MeOH/H2O_V2 9:1": 66.0,
+        "THF": 66.0,
+        "THF_V2": 66.0
+      },
+      "protic": {
+        "DMF": 0.0,
+        "MeCN": 0.0,
+        "MeOH": 1.0,
+        "MeOH/H2O_V2 9:1": 1.0,
+        "THF": 0.0,
+        "THF_V2": 0.0
+      },
+      "coordinating": {
+        "DMF": 4.0,
+        "MeCN": 5.0,
+        "MeOH": 2.0,
+        "MeOH/H2O_V2 9:1": 2.0,
+        "THF": 2.0,
+        "THF_V2": 2.0
+      },
+      "water_miscible": {
+        "DMF": 1.0,
+        "MeCN": 1.0,
+        "MeOH": 1.0,
+        "MeOH/H2O_V2 9:1": 1.0,
+        "THF": 1.0,
+        "THF_V2": 1.0
+      }
+    },
+    "spread": {
+      "dielectric_constant": {
+        "DMF": 0.0,
+        "MeCN": 0.9,
+        "MeOH": 0.0,
+        "MeOH/H2O_V2 9:1": 3.0,
+        "THF": 0.0,
+        "THF_V2": 0.0
+      },
+      "boiling_point_c": {
+        "DMF": 0.0,
+        "MeCN": 0.0,
+        "MeOH": 0.0,
+        "MeOH/H2O_V2 9:1": 1.0,
+        "THF": 0.0,
+        "THF_V2": 0.0
+      },
+      "protic": {
+        "DMF": 0.0,
+        "MeCN": 0.0,
+        "MeOH": 0.0,
+        "MeOH/H2O_V2 9:1": 0.0,
+        "THF": 0.0,
+        "THF_V2": 0.0
+      },
+      "coordinating": {
+        "DMF": 0.5,
+        "MeCN": 0.0,
+        "MeOH": 0.0,
+        "MeOH/H2O_V2 9:1": 0.0,
+        "THF": 0.5,
+        "THF_V2": 0.5
+      },
+      "water_miscible": {
+        "DMF": 0.0,
+        "MeCN": 0.0,
+        "MeOH": 0.0,
+        "MeOH/H2O_V2 9:1": 0.0,
+        "THF": 0.0,
+        "THF_V2": 0.0
+      }
+    },
+    "spec": [
+      {
+        "name": "dielectric_constant",
+        "lower": 1,
+        "upper": 80,
+        "meaning": "relative permittivity at 25 C"
+      },
+      {
+        "name": "boiling_point_c",
+        "lower": 30,
+        "upper": 250,
+        "meaning": "boiling point in C"
+      },
+      {
+        "name": "protic",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if protic (has O-H or N-H), else 0"
+      },
+      {
+        "name": "coordinating",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "1 non-coordinating (toluene) to 5 strongly coordinating to Pd (DMSO, MeCN)"
+      },
+      {
+        "name": "water_miscible",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if fully miscible with water, else 0"
+      }
+    ],
+    "model": "qwen3.8-flash-next",
+    "n_samples": 3,
+    "issues": [],
+    "notes": [
+      "THF_V2 treated as THF and MeOH/H2O_V2 9:1 estimated as 90:10 v/v methanol/water.",
+      "THF_V2 is treated as the same solvent as THF, and MeOH/H2O 9:1 values are approximate mixture properties.",
+      "Mixture values are approximate and THF_V2 was treated as equivalent to THF."
+    ],
+    "created_at": "2026-11-02T15:08:22+00:00",
+    "confirmed_by": null
+  }
+]

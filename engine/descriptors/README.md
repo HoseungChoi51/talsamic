@@ -12,3 +12,8 @@ Known issues in `buchwald_hartwig.json`:
 - The additive table rests on one sample, because two calls hit the old 600 s per-call timeout. Its spread is null, meaning unknown. It will be redone with 3 samples and a longer timeout using `--variables additive`.
 - `n_o_bond_lability` for the additives looks the least chemically grounded. The C3-H isoxazoles (A01, A12, A19, A20), which should open their ring most easily under base, don't stand out.
 - The BTMG and MTBD pKa values vary by about 9–10 between samples, and they look like MeCN values rather than DMSO values. Their order is still right.
+
+Known issues in `suzuki.json`:
+- The ligand table has no values for P(Ph)3. The data file names it "P(Ph)3 " with a trailing space, and the descriptor tool didn't match the LLM's trimmed name. Names are now trimmed, and the ligand table will be redone. The redo also gives the LLM each ligand's structure, since the first run took AmPhos for a biaryl phosphine and CataCXium A for a ferrocene bisphosphine.
+- `halide_reactivity` is null for the boron reagents in the electrophile column, because it doesn't apply to them. The model then sees the column average, and `ring_electron_poor` (4–5 for all) carries little information.
+- For "2d, Bromide" as a nucleophile, the reactivity and polarity values have a spread of 3, because a bromide isn't a nucleophile in this reaction.

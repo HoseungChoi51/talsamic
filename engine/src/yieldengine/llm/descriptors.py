@@ -136,7 +136,7 @@ def propose(var: Variable, client: ChatClient, smiles: dict[str, str] | None = N
         for d in spec:
             col = {}
             for c in var.categories:
-                x = got.get(c, {}).get(d.name)
+                x = got.get(str(c).strip(), {}).get(d.name)
                 try:
                     x = float(x)
                 except (TypeError, ValueError):
@@ -146,7 +146,7 @@ def propose(var: Variable, client: ChatClient, smiles: dict[str, str] | None = N
                     x = np.nan
                 col[c] = x
             sample[d.name] = col
-        missing = [c for c in var.categories if c not in got]
+        missing = [c for c in var.categories if str(c).strip() not in got]
         if missing:
             issues.append(f"sample {k}: no values for {', '.join(missing)}")
         samples.append(sample)
@@ -186,7 +186,9 @@ def attach(schema: Schema, tables: list[DescriptorTable], require_confirmed: boo
             continue
         if require_confirmed and not t.confirmed_by:
             raise ValueError(f"descriptors for {v.name} have not been confirmed by an engineer")
-        desc = {d: {c: x for c, x in col.items() if x is not None} for d, col in t.values.items()}
+        name = {str(c).strip(): c for c in v.categories}  # match names even if one side has stray spaces
+        desc = {d: {name[k.strip()]: x for k, x in col.items() if x is not None and k.strip() in name}
+                for d, col in t.values.items()}
         desc = {d: col for d, col in desc.items() if len(set(col.values())) > 1}  # constant = no information
         new.append(Variable(**{**v.__dict__, "descriptors": desc}))
     return Schema(new, schema.date_column, schema.reference_column)

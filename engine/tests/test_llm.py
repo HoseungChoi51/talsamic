@@ -118,3 +118,13 @@ def test_cli_redoes_only_named_variables(tmp_path, monkeypatch):
     assert list(second) == ["ligand", "base"]
     assert first["ligand"].values["steric_bulk"]["L1"] == 1 and second["ligand"].values["steric_bulk"]["L1"] == 4
     assert second["base"].created_at == first["base"].created_at  # kept as it was
+
+
+def test_category_names_with_stray_spaces_still_match():
+    b = _toy()
+    var = b.schema["ligand"]
+    spaced = type(var)(**{**var.__dict__, "categories": ["L1 ", "L2", "L3", "L4"]})
+    t = propose(spaced, FakeLLM([_reply()]), n_samples=1)
+    assert t.values["steric_bulk"]["L1 "] == 1 and not t.issues
+    schema = attach(b.schema, [t])  # table says "L1 ", data says "L1"
+    assert "L1" in schema["ligand"].descriptors["steric_bulk"]
