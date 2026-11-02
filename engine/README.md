@@ -115,3 +115,28 @@ isn't in `facts`, the fixed template is shown instead.
 pip install -e ".[dev]"
 pytest -q            # ~10 s, GP only
 ```
+
+## Benchmarks
+
+There are three real reaction-yield datasets, downloaded from GitHub and cached in
+`~/.cache/yieldengine`. They're harder than the fake plant because the conditions are
+chemicals: a tabular model sees only category codes, while an LLM knows what the
+chemicals are.
+
+| Benchmark | Rows | Conditions | Hard splits |
+|---|---|---|---|
+| `buchwald_hartwig` (Ahneman 2018) | 3955 | ligand, base, aryl halide, additive | `additive_test1-4` (the paper's held-out additives) |
+| `suzuki` (Perera 2018) | 5760 | electrophile, nucleophile, ligand, base, solvent | `ligand_out1-4` |
+| `direct_arylation` (Shields 2021, EDBO) | 1728 | ligand, base, solvent, concentration, temperature | `ligand_out1-4` |
+
+Every benchmark also has `random70`, plus `n100`/`n100b`: 100 training runs, about
+the size of a plant's history.
+
+```bash
+# prediction: accuracy, and whether the 80% ranges hold
+python -m yieldengine.benchmarks.run --models gp exaone-tabular tabfm --out results/prediction.csv
+# optimization: start from 10 low-yield runs, then 8 rounds of 8 suggestions (6 optimize + 2 learn)
+python -m yieldengine.benchmarks.campaign --models random gp exaone-tabular --start low --seeds 0 1 2 3
+```
+
+The GP baseline is limited to 500 training rows, because exact GP gets slow fast.

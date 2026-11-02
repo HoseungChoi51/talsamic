@@ -58,6 +58,7 @@ class BatchSettings:
     max_changes: int = 2  # 한 번에 바꿀 조건 수 (fixed conditions don't count)
     n_candidates: int = 4000
     min_separation: float = 0.08
+    radius: float | None = None  # override the risk level's distance limit (benchmarks)
     seed: int = 0
 
     def resolved_split(self) -> tuple[int, int, int]:
@@ -160,6 +161,30 @@ def sample_candidates(schema: Schema, settings: BatchSettings, rng: np.random.Ge
     return df.drop_duplicates(ignore_index=True)
 
 
+def filter_pool(schema: Schema, settings: BatchSettings, pool: pd.DataFrame) -> pd.DataFrame:
+    """Keep pool recipes that respect fixed conditions, limits and the change limit."""
+    base = base_recipe(schema, settings)
+    df = pool[[v.name for v in schema.controls]].drop_duplicates().reset_index(drop=True)
+    keep = np.ones(len(df), bool)
+    n_changed = np.zeros(len(df), int)
+    for v in schema.controls:
+        col = df[v.name]
+        if v.is_continuous:
+            lo, hi = _bounds(v, settings.limits)
+            x = col.astype(float).to_numpy()
+            keep &= (x >= lo - 1e-9) & (x <= hi + 1e-9)
+            same = np.abs(x - float(base[v.name])) < 1e-9
+        else:
+            keep &= col.astype(str).isin(_allowed(v, settings.limits)).to_numpy()
+            same = (col.astype(str) == str(base[v.name])).to_numpy()
+        if v.name in settings.fixed:
+            keep &= same
+        else:
+            n_changed += ~same
+    keep &= n_changed <= settings.max_changes
+    return df[keep].reset_index(drop=True)
+
+
 def score(pred: Prediction, risk: RiskLevel, incumbent: float) -> np.ndarray:
     if risk.rank_by == "ei":
         z = (pred.mean - incumbent) / pred.sd
@@ -213,9 +238,15 @@ def suggest_batch(
     schema: Schema,
     settings: BatchSettings | None = None,
     context: dict[str, Any] | None = None,
+    candidates: pd.DataFrame | None = None,
 ) -> Batch:
     """``model`` should be fitted (ideally a ``CalibratedModel``); ``context`` holds the
-    current lot/date values to predict for, e.g. ``FakePlant.context_now(history)``."""
+    current lot/date values to predict for, e.g. ``FakePlant.context_now(history)``.
+
+    ``candidates``: a fixed pool of recipes to choose from instead of sampling (e.g. the
+    combinations a plant can actually run, or a benchmark's untested reactions). The same
+    constraints apply; runs that separate aliased conditions are skipped because they
+    may not be in the pool."""
     settings = settings or BatchSettings()
     risk = RISK_LEVELS[settings.risk]
     rng = np.random.default_rng(settings.seed)
@@ -225,7 +256,12 @@ def suggest_batch(
     base = base_recipe(schema, settings)
     past = data[[v.name for v in schema.controls]]
 
-    cands = sample_candidates(schema, settings, rng)
+    if candidates is None:
+        cands = sample_candidates(schema, settings, rng)
+    else:
+        cands = filter_pool(schema, settings, candidates)
+        if cands.empty:
+            raise ValueError("no candidate in the pool satisfies the fixed conditions, limits and max changes")
     cands = cands.assign(**context)
     pred = model.predict(cands)  # one call scores every candidate
     dist = nearest_distance(schema, cands, past)
@@ -236,7 +272,8 @@ def suggest_batch(
     std_row = pd.DataFrame([standard]).assign(**context)
     std_pred = float(model.predict(std_row).mean[0])
 
-    inside = dist <= risk.radius
+    radius = settings.radius if settings.radius is not None else risk.radius
+    inside = dist <= radius
     if inside.sum() < 5 * max(1, n_opt):  # too few inside the radius: keep the closest
         inside = dist <= np.quantile(dist, min(1.0, 5 * max(1, n_opt) / len(dist)))
     s = score(pred, risk, incumbent)
@@ -263,7 +300,7 @@ def suggest_batch(
         add(OPTIMIZE, recipe, pred.mean[i], lo80[i], hi80[i], facts, reason)
 
     # ---- learn runs ---------------------------------------------------------------
-    learn_rows = _disentangle_runs(schema, data, settings, base)[:n_learn]
+    learn_rows = [] if candidates is not None else _disentangle_runs(schema, data, settings, base)[:n_learn]
     if learn_rows:
         lr = pd.DataFrame([r for r, _ in learn_rows]).assign(**context)
         lp = model.predict(lr)
@@ -276,7 +313,7 @@ def suggest_batch(
             add(LEARN, recipe, lp.mean[k], llo[k], lhi[k], facts, reason)
     n_left = n_learn - len(learn_rows)
     if n_left > 0:
-        wide = dist <= min(1.0, risk.radius * 1.5)
+        wide = dist <= max(min(1.0, radius * 1.5), np.min(dist))
         order = np.argsort(-np.where(wide, pred.sd, -np.inf))[: int(wide.sum())]
         taken = [cands.iloc[opt_idx]] + ([pd.DataFrame([r for r, _ in learn_rows])] if learn_rows else [])
         for i in _pick_diverse(schema, cands, order, n_left, taken, settings.min_separation * 2):

@@ -18,11 +18,16 @@ def support_counts(data: pd.DataFrame, var: Variable, grid: np.ndarray, frac: fl
     return (np.abs(x[None, :] - grid[:, None]) <= bandwidth(var, frac)).sum(axis=1)
 
 
-def control_distance(schema: Schema, a: pd.DataFrame, b: pd.DataFrame) -> np.ndarray:
+CATEGORY_SWAP = 0.25  # distance of switching one categorical condition (catalyst, ligand, solvent)
+
+
+def control_distance(schema: Schema, a: pd.DataFrame, b: pd.DataFrame, swap: float = CATEGORY_SWAP) -> np.ndarray:
     """Distance between recipes over controllable conditions, shape (len(a), len(b)).
 
     Continuous differences are divided by the variable's range; a different category
-    counts as 1. Moving one variable across its whole range gives distance 1.
+    counts as ``swap`` (0.25, like moving a number a quarter of its range): one swap fits
+    the 균형 risk limit (0.30), two fit 도전적으로 (0.60), none fit 안전하게 (0.15).
+    Moving one number across its whole range gives distance 1.
     """
     d2 = np.zeros((len(a), len(b)))
     for v in schema.controls:
@@ -31,7 +36,7 @@ def control_distance(schema: Schema, a: pd.DataFrame, b: pd.DataFrame) -> np.nda
             xb = b[v.name].to_numpy(float)[None, :]
             d2 += ((xa - xb) / v.span()) ** 2
         else:
-            d2 += (a[v.name].astype(str).to_numpy()[:, None] != b[v.name].astype(str).to_numpy()[None, :])
+            d2 += swap**2 * (a[v.name].astype(str).to_numpy()[:, None] != b[v.name].astype(str).to_numpy()[None, :])
     return np.sqrt(d2)
 
 
