@@ -15,6 +15,6 @@ Known issues in `buchwald_hartwig.json`:
 - The BTMG and MTBD pKa values vary by about 9–10 between samples, and they look like MeCN values rather than DMSO values. Their order is still right.
 
 Known issues in `suzuki.json`:
-- The ligand table has no values for P(Ph)3. The data file names it "P(Ph)3 " with a trailing space, and the descriptor tool didn't match the LLM's trimmed name. Names are now trimmed, and the ligand table will be redone. The redo also gives the LLM each ligand's structure, since the first run took AmPhos for a biaryl phosphine and CataCXium A for a ferrocene bisphosphine.
+- The ligand table was redone (18 min, 0 issues) after two fixes. The data file names one ligand "P(Ph)3 " with a trailing space, so the first run left it empty. And the first run took AmPhos for a biaryl phosphine and CataCXium A for a ferrocene bisphosphine; the LLM now gets each ligand's structure, and both are classified correctly. The cone angles still run high (AmPhos 210° with a spread of 39, against a realistic ~170–180°; SPhos, dtbpf and XPhos are also at 210–220°). Treat `cone_angle_deg` as loose; `steric_bulk` orders the ligands better.
 - `halide_reactivity` is null for the boron reagents in the electrophile column, because it doesn't apply to them. The model then sees the column average, and `ring_electron_poor` (4–5 for all) carries little information.
 - For "2d, Bromide" as a nucleophile, the reactivity and polarity values have a spread of 3, because a bromide isn't a nucleophile in this reaction.
