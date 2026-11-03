@@ -100,11 +100,18 @@ and added to every prediction, and its uncertainty is added to the range.
 batch notes get a sentence (최근 2주 실험이 … 모든 예상 수율을 2.1%p 낮췄다.).
 `Engine(..., drift_correction=False)` turns it off. The 발견 drift finding is unchanged.
 
-On the fake plant (`python -m yieldengine.benchmarks.drift`, GP, 5 seeds), older recipes
-rerun today go from 0.74%p too high to 0.06%p, and their 80% ranges from 77% to 87%
-coverage. Without drift the correction never switched on. Suggested batches still come
-in about 1.1%p below prediction even with no drift: the optimize runs are picked where the
-model is most optimistic (the optimizer's curse), which this correction does not address.
+On the fake plant (`python -m yieldengine.benchmarks.drift`), with a 2%p drop:
+
+| | older recipes rerun today: bias, 80% coverage | suggested batch: bias, 80% coverage |
+|:--|:--|:--|
+| GP, 5 seeds | −0.74 → −0.06%p, 77% → 87% | −1.80 → −1.37%p, 67% → 68% |
+| TabFM 1.1, 4 seeds (X670) | −0.42 → 0.01%p, 90% → 93% | −1.18 → −0.48%p, 77% → 75% |
+
+Without drift the correction never switched on. In the demo with TabFM, the 이번 주 check
+went from 6/12 inside the range (mean error −2.0%p) to 9/12 (−1.2%p). Suggested batches
+still come in low even with no drift (GP −1.1%p, TabFM −0.4%p): the optimize runs are
+picked where the model is most optimistic (the optimizer's curse), which this correction
+does not address.
 
 **New-chemical guard** (`novelty.py`). A model learns what a ligand, base or catalyst
 does only from runs that used it, so a recipe with a value the past runs never used is
