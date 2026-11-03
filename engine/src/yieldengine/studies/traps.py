@@ -503,41 +503,89 @@ def _batch_share(d, truth):
     return np.var(diff) / np.var(d["yield"])
 
 
-def mechanism_sparse() -> dict:
-    """Expectation 3: recover the mechanism with statistics, not with the foundation model.
-    Initial-rate regime (yield < 0.3, below 220 C, product not yet over-reacting):
-    ln y ~ ln k1 + ln t, so a sparse fit on physical terms should give Ea per metal."""
-    from sklearn.linear_model import LassoCV, LinearRegression
+def _kinetic_fit(d: pd.DataFrame, truth: pd.DataFrame) -> dict:
+    """Fit the hypothesised kinetics A -> B -> C by nonlinear least squares: Arrhenius
+    rate per metal (Ea relative to 200 C), loading, support area, oxidation state,
+    pressure order, catalyst saturation, promoter, solvent, and a thermal over-reaction.
+    Rows above 236 C and rows with an unrecorded promoter amount are left out."""
+    from scipy.optimize import least_squares
 
+    MET, SOL = list(S.METALS), list(S.SOLVENTS)
+    m = ((d["T_C"] < 236) & (truth["promoter_blank"] != "not recorded")).to_numpy()
+    dd = d[m].reset_index(drop=True)
+    tp = truth.loc[m, "true_promoter"].to_numpy()
+    cat = dd["catalyst"].map(S.CAT_BY_NAME)
+    mi = cat.map(lambda c: MET.index(c.metal)).to_numpy()
+    x = 1 / (dd["T_C"].to_numpy() + 273.15) - 1 / 473.15
+    lnload = np.log(cat.map(lambda c: c.loading)).to_numpy(float)
+    lnbet = np.log(cat.map(lambda c: S.SUPPORTS[c.support][0] / 180)).to_numpy(float)
+    ox = cat.map(lambda c: float(c.ox_state > 0)).to_numpy(float)
+    lnP = np.log(dd["P_bar"] / 10).to_numpy()
+    cm, t = dd["cat_mol"].to_numpy(), dd["t_h"].to_numpy()
+    si = dd["solvent"].map(SOL.index).to_numpy()
+    ptm = tp / (tp + 0.7)
+    y = dd["yield"].to_numpy()
+
+    def pred(p):
+        a, ea = p[0:6], p[6:12]
+        bl, bb, dox, cP, lKm, g, lA2, ea2 = p[12:20]
+        sv = np.r_[0, p[20:23]]
+        lnk1 = (a[mi] - (ea[mi] + dox * ox) / S.R * x + bl * lnload + bb * lnbet + cP * lnP
+                + np.log(cm / (cm + np.exp(lKm))) + np.log1p(g * ptm) + sv[si])
+        k1 = np.exp(np.clip(lnk1, -30, 10))
+        k2 = np.exp(np.clip(lA2 - ea2 / S.R * x, -30, 10))
+        dk = k2 - k1
+        dk = np.where(np.abs(dk) < 1e-9, 1e-9, dk)
+        return k1 / dk * (np.exp(-k1 * t) - np.exp(-k2 * t))
+
+    p0 = np.r_[np.full(6, -2.0), np.full(6, 70.0), 0, 0, 0, 0, 0, 0.5, -4, 120, 0, 0, 0]
+    lo = np.r_[np.full(6, -15), np.full(6, 0), -3, -3, -50, -2, -5, 0, -15, 0, -3, -3, -3]
+    hi = np.r_[np.full(6, 10), np.full(6, 250), 3, 3, 50, 3, 5, 10, 10, 300, 3, 3, 3]
+    res = least_squares(lambda p: pred(p) - y, p0, bounds=(lo, hi), loss="soft_l1", f_scale=0.05, max_nfev=20000)
+    cov = np.linalg.pinv(res.jac.T @ res.jac) * np.mean(res.fun ** 2)
+    se = np.sqrt(np.clip(np.diag(cov), 0, None))
+    p = res.x
+    n = np.bincount(mi, minlength=6)
+    return {"rows_used": int(m.sum()), "rmse": float(np.sqrt(np.mean(res.fun ** 2))),
+            "Ea": {MET[i]: {"est": float(p[6 + i]), "se": float(se[6 + i]), "true": S.METALS[MET[i]][0], "n": int(n[i])}
+                   for i in range(6)},
+            "Ea2": {"est": float(p[19]), "se": float(se[19]), "true": S.EA2},
+            "pressure_order": {"est": float(p[15]), "se": float(se[15]), "true": 0.4},
+            "ox_penalty": {"est": float(p[14]), "se": float(se[14]), "true": 5.0}}
+
+
+def _window_ols(d: pd.DataFrame, truth: pd.DataFrame) -> dict:
+    """The tempting shortcut: keep rows with a low yield (0.03-0.3, below 220 C), call it
+    the initial-rate regime, and regress ln(yield) on 1/T per metal plus physical terms.
+    Choosing rows by their yield truncates the outcome and flattens every slope."""
+    from sklearn.linear_model import LinearRegression
+
+    m = ((d["yield"] > 0.03) & (d["yield"] < 0.3) & (d["T_C"] < 220)).to_numpy()
+    dd = d[m].reset_index(drop=True)
+    tp = truth.loc[m, "true_promoter"].to_numpy()
+    metal = dd["catalyst"].map(lambda c: S.CAT_BY_NAME[c].metal)
+    cat = dd["catalyst"].map(S.CAT_BY_NAME)
+    lib = pd.DataFrame({"ln_t": np.log(dd["t_h"]), "ln_P": np.log(dd["P_bar"]),
+                        "ln_cat_frac": np.log(dd["cat_mol"] / (dd["cat_mol"] + 1.5)),
+                        "promoter_term": np.log1p(0.8 * tp / (tp + 0.7)),
+                        "ln_loading": np.log(cat.map(lambda c: c.loading)), "ox": cat.map(lambda c: float(c.ox_state > 0)),
+                        "ln_bet": np.log(cat.map(lambda c: S.SUPPORTS[c.support][0])), "stir": dd["stir_rpm"] / 1000,
+                        **{f"solvent_{s}": (dd["solvent"] == s).astype(float) for s in S.SOLVENTS}})
+    for mt in S.METALS:
+        lib[f"metal_{mt}"] = (metal == mt).astype(float)
+        lib[f"invT_{mt}"] = (metal == mt) * (1 / (S.R * (dd["T_C"] + 273.15)))
+    c = dict(zip(lib.columns, LinearRegression().fit(lib, np.log(dd["yield"].to_numpy())).coef_))
+    return {"rows_used": int(m.sum()), "ln_t_coef": float(c["ln_t"]), "ln_P_coef": float(c["ln_P"]),
+            "Ea": {mt: {"est": float(-c[f"invT_{mt}"]), "true": S.METALS[mt][0], "n": int((metal == mt).sum())}
+                   for mt in S.METALS if (metal == mt).sum() >= 8}}
+
+
+def mechanism_sparse() -> dict:
+    """Expectation 3: recover the mechanism with statistics, not with the foundation model."""
     out = {}
     for name, kw in (("history", {}), ("clean_design", dict(biased=False, confounded=False))):
         d, truth = history(**kw)
-        m = (d["yield"] > 0.03) & (d["yield"] < 0.3) & (d["T_C"] < 220)
-        dd = d[m].reset_index(drop=True)
-        tp = truth.loc[m, "true_promoter"].to_numpy()
-        metal = dd["catalyst"].map(lambda c: S.CAT_BY_NAME[c].metal)
-        cat = dd["catalyst"].map(S.CAT_BY_NAME)
-        lib = pd.DataFrame({"ln_t": np.log(dd["t_h"]), "t": dd["t_h"], "T": dd["T_C"], "T2": (dd["T_C"] / 100) ** 2,
-                            "ln_P": np.log(dd["P_bar"]), "P": dd["P_bar"], "ln_cat_frac": np.log(dd["cat_mol"] / (dd["cat_mol"] + 1.5)),
-                            "cat_mol": dd["cat_mol"], "promoter_term": np.log1p(0.8 * tp / (tp + 0.7)),
-                            "ln_loading": np.log(cat.map(lambda c: c.loading)), "ox": cat.map(lambda c: float(c.ox_state > 0)),
-                            "ln_bet": np.log(cat.map(lambda c: S.SUPPORTS[c.support][0])), "stir": dd["stir_rpm"] / 1000,
-                            **{f"solvent_{s}": (dd["solvent"] == s).astype(float) for s in S.SOLVENTS}})
-        for mt in S.METALS:
-            lib[f"metal_{mt}"] = (metal == mt).astype(float)
-            lib[f"invT_{mt}"] = (metal == mt) * (1 / (S.R * (dd["T_C"] + 273.15)))
-        cols = list(lib.columns)
-        Z = (lib - lib.mean()) / lib.std().replace(0, 1)
-        yv = np.log(dd["yield"].to_numpy())
-        las = LassoCV(cv=5, random_state=0, max_iter=50000).fit(Z.fillna(0), yv)
-        keep = [c for c, b in zip(cols, las.coef_) if abs(b) > 1e-6]
-        ols = LinearRegression().fit(lib[keep], yv)
-        coef = dict(zip(keep, ols.coef_))
-        ea = {mt: {"est": float(-coef[f"invT_{mt}"]) if f"invT_{mt}" in coef else None,
-                   "true": S.METALS[mt][0] + 0.0, "n": int((metal == mt).sum())} for mt in S.METALS}
-        out[name] = {"rows_used": int(m.sum()), "selected": keep, "dropped": [c for c in cols if c not in keep],
-                     "coef": {k: float(v) for k, v in coef.items()}, "Ea": ea,
-                     "ln_t_coef": float(coef.get("ln_t", np.nan)), "stir_selected": "stir" in keep}
+        out[name] = {"kinetic": _kinetic_fit(d, truth), "window_ols": _window_ols(d, truth)}
     # GP with ARD on the engineered features: which inputs get short length scales?
     from .models import GPModel
 
