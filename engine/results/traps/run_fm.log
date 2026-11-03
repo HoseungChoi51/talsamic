@@ -1,0 +1,179 @@
+[tabfm] accuracy ...
+Fetching 3 files:   0%|          | 0/3 [00:00<?, ?it/s]Fetching 3 files: 100%|██████████| 3/3 [00:00<00:00, 2453.29it/s]
+Loading weights from local directory
+[tabfm] accuracy done in 55s
+[tabfm] extrapolation ...
+[tabfm] extrapolation done in 6s
+[tabfm] encoding ...
+[tabfm] encoding done in 17s
+[tabfm] missingness ...
+[tabfm] missingness done in 7s
+[tabfm] bounded ...
+[tabfm] bounded done in 49s
+[tabfm] selection ...
+[tabfm] selection done in 13s
+[tabfm] causal ...
+[tabfm] causal done in 2s
+[tabfm] mechanism_probe ...
+[tabfm] mechanism_probe done in 1s
+[tabfm] acquisition ...
+[tabfm] acquisition done in 230s
+wrote results/traps/tabfm.json errors: []
+[exaone-tabular] accuracy ...
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+manifest pins no checkpoint_sha256; loading /home/hopung/.cache/huggingface/hub/models--LG-AI-Research--EXAONE-Tabular/snapshots/093ad1c2613e1e95d26df8610451d2e02ed53cbe/exaone-tabular-regressor-v1_default.safetensors without an integrity check (structural validation still runs)
+[exaone-tabular] accuracy done in 9s
+[exaone-tabular] extrapolation ...
+[exaone-tabular] extrapolation done in 1s
+[exaone-tabular] encoding ...
+[exaone-tabular] encoding done in 5s
+[exaone-tabular] missingness ...
+[exaone-tabular] missingness done in 2s
+[exaone-tabular] bounded ...
+[exaone-tabular] bounded done in 3s
+[exaone-tabular] selection ...
+[exaone-tabular] selection done in 2s
+[exaone-tabular] causal ...
+[exaone-tabular] causal done in 2s
+[exaone-tabular] mechanism_probe ...
+[exaone-tabular] mechanism_probe done in 1s
+[exaone-tabular] acquisition ...
+[exaone-tabular] acquisition done in 23s
+wrote results/traps/exaone-tabular.json errors: []
+[limix-16m] accuracy ...
+arch_version=1.0 -> inference.v1_0.predictor (inference.v1_0.predictor)
+use limix v1.0
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+[limix-16m] accuracy done in 74s
+[limix-16m] extrapolation ...
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+[limix-16m] extrapolation done in 7s
+[limix-16m] encoding ...
+arch_version=1.0 -> inference.v1_0.predictor (inference.v1_0.predictor)
+use limix v1.0
+arch_version=1.0 -> inference.v1_0.predictor (inference.v1_0.predictor)
+use limix v1.0
+arch_version=1.0 -> inference.v1_0.predictor (inference.v1_0.predictor)
+use limix v1.0
+[limix-16m] encoding done in 21s
+[limix-16m] missingness ...
+arch_version=1.0 -> inference.v1_0.predictor (inference.v1_0.predictor)
+use limix v1.0
+[limix-16m] missingness done in 9s
+[limix-16m] bounded ...
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+[limix-16m] bounded done in 68s
+[limix-16m] selection ...
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+[limix-16m] selection done in 15s
+[limix-16m] causal ...
+[limix-16m] causal done in 2s
+[limix-16m] mechanism_probe ...
+[limix-16m] mechanism_probe done in 1s
+[limix-16m] acquisition ...
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+/home/hopung/Work/talsamic-traps/engine/src/yieldengine/studies/models.py:277: UserWarning: limix-16m native distribution failed, using bootstrap: RuntimeError: LimiX used the 'mse' head, no histogram
+  warnings.warn(f"{self.name} native distribution failed, using bootstrap: {self.native_error}")
+[limix-16m] acquisition done in 225s
+wrote results/traps/limix-16m.json errors: []
