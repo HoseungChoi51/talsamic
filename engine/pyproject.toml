@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yieldengine"
+version = "0.1.0"
+description = "Engine behind the yield optimization tool: findings, what-if curves and batch suggestions"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "pandas>=2.0", "scipy>=1.10", "scikit-learn>=1.3", "tabulate>=0.9", "openpyxl>=3.1"]
+
+[project.optional-dependencies]
+tabfm = ["tabfm[pytorch]", "huggingface_hub>=0.20"]
+limix = ["torch>=2.2", "huggingface_hub>=0.20"]
+dev = ["pytest>=7"]
+
+[project.scripts]
+yieldengine-demo = "yieldengine.demo:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

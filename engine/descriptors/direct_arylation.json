@@ -1,0 +1,409 @@
+[
+  {
+    "variable": "ligand",
+    "values": {
+      "steric_bulk": {
+        "BrettPhos": 5.0,
+        "CgMe-PPh": 3.0,
+        "JackiePhos": 5.0,
+        "P(2-furyl)3": 1.0,
+        "PCy3": 4.0,
+        "PPh2Me": 2.0,
+        "PPh3": 3.0,
+        "PPhMe2": 2.0,
+        "PhPtBu-CPhos": 4.0,
+        "PtBu2Ph": 4.0,
+        "RuPhos": 5.0,
+        "XPhos": 5.0
+      },
+      "electron_richness": {
+        "BrettPhos": 4.5,
+        "CgMe-PPh": 3.5,
+        "JackiePhos": 2.0,
+        "P(2-furyl)3": 1.0,
+        "PCy3": 5.0,
+        "PPh2Me": 3.0,
+        "PPh3": 2.0,
+        "PPhMe2": 3.5,
+        "PhPtBu-CPhos": 3.5,
+        "PtBu2Ph": 5.0,
+        "RuPhos": 4.5,
+        "XPhos": 4.5
+      },
+      "cone_angle_deg": {
+        "BrettPhos": 220.0,
+        "CgMe-PPh": 150.0,
+        "JackiePhos": 210.0,
+        "P(2-furyl)3": 108.0,
+        "PCy3": 170.0,
+        "PPh2Me": 132.0,
+        "PPh3": 145.0,
+        "PPhMe2": 122.0,
+        "PhPtBu-CPhos": 190.0,
+        "PtBu2Ph": 170.0,
+        "RuPhos": 218.0,
+        "XPhos": 215.0
+      },
+      "biaryl_phosphine": {
+        "BrettPhos": 1.0,
+        "CgMe-PPh": 0.0,
+        "JackiePhos": 1.0,
+        "P(2-furyl)3": 0.0,
+        "PCy3": 0.0,
+        "PPh2Me": 0.0,
+        "PPh3": 0.0,
+        "PPhMe2": 0.0,
+        "PhPtBu-CPhos": 1.0,
+        "PtBu2Ph": 0.0,
+        "RuPhos": 1.0,
+        "XPhos": 1.0
+      },
+      "bidentate": {
+        "BrettPhos": 0.0,
+        "CgMe-PPh": 0.0,
+        "JackiePhos": 0.0,
+        "P(2-furyl)3": 0.0,
+        "PCy3": 0.0,
+        "PPh2Me": 0.0,
+        "PPh3": 0.0,
+        "PPhMe2": 0.0,
+        "PhPtBu-CPhos": 0.0,
+        "PtBu2Ph": 0.0,
+        "RuPhos": 0.0,
+        "XPhos": 0.0
+      }
+    },
+    "spread": {
+      "steric_bulk": {
+        "BrettPhos": 0.0,
+        "CgMe-PPh": 0.5,
+        "JackiePhos": 0.0,
+        "P(2-furyl)3": 0.0,
+        "PCy3": 0.0,
+        "PPh2Me": 0.0,
+        "PPh3": 0.0,
+        "PPhMe2": 0.0,
+        "PhPtBu-CPhos": 0.5,
+        "PtBu2Ph": 0.5,
+        "RuPhos": 1.0,
+        "XPhos": 0.0
+      },
+      "electron_richness": {
+        "BrettPhos": 1.0,
+        "CgMe-PPh": 2.0,
+        "JackiePhos": 0.0,
+        "P(2-furyl)3": 0.0,
+        "PCy3": 0.0,
+        "PPh2Me": 1.0,
+        "PPh3": 0.0,
+        "PPhMe2": 1.0,
+        "PhPtBu-CPhos": 1.0,
+        "PtBu2Ph": 0.5,
+        "RuPhos": 1.0,
+        "XPhos": 1.0
+      },
+      "cone_angle_deg": {
+        "BrettPhos": 20.0,
+        "CgMe-PPh": 5.0,
+        "JackiePhos": 15.0,
+        "P(2-furyl)3": 10.0,
+        "PCy3": 0.0,
+        "PPh2Me": 13.0,
+        "PPh3": 0.0,
+        "PPhMe2": 15.0,
+        "PhPtBu-CPhos": 30.0,
+        "PtBu2Ph": 5.0,
+        "RuPhos": 30.0,
+        "XPhos": 15.0
+      },
+      "biaryl_phosphine": {
+        "BrettPhos": 0.0,
+        "CgMe-PPh": 0.0,
+        "JackiePhos": 0.0,
+        "P(2-furyl)3": 0.0,
+        "PCy3": 0.0,
+        "PPh2Me": 0.0,
+        "PPh3": 0.0,
+        "PPhMe2": 0.0,
+        "PhPtBu-CPhos": 0.0,
+        "PtBu2Ph": 0.0,
+        "RuPhos": 0.0,
+        "XPhos": 0.0
+      },
+      "bidentate": {
+        "BrettPhos": 0.0,
+        "CgMe-PPh": 0.0,
+        "JackiePhos": 0.0,
+        "P(2-furyl)3": 0.0,
+        "PCy3": 0.0,
+        "PPh2Me": 0.0,
+        "PPh3": 0.0,
+        "PPhMe2": 0.0,
+        "PhPtBu-CPhos": 0.0,
+        "PtBu2Ph": 0.0,
+        "RuPhos": 0.0,
+        "XPhos": 0.0
+      }
+    },
+    "spec": [
+      {
+        "name": "steric_bulk",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "bulk around the metal: 1 small (PMe3) to 5 very bulky (P(tBu)3, AdBrettPhos)"
+      },
+      {
+        "name": "electron_richness",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "sigma-donor strength: 1 poor (P(2-furyl)3) to 5 very rich (P(tBu)3, PCy3)"
+      },
+      {
+        "name": "cone_angle_deg",
+        "lower": 100,
+        "upper": 220,
+        "meaning": "Tolman cone angle estimate in degrees"
+      },
+      {
+        "name": "biaryl_phosphine",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if a Buchwald-type dialkylbiaryl phosphine, else 0"
+      },
+      {
+        "name": "bidentate",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if it binds through two donor atoms, else 0"
+      }
+    ],
+    "model": "qwen3.8-flash-next",
+    "n_samples": 3,
+    "issues": [],
+    "notes": [
+      "Cone angles for biaryl and cage phosphines are approximate effective Tolman estimates, and JackiePhos/PhPtBu-CPhos were treated as Buchwald-type biaryl phosphines despite mixed aryl/alkyl substitution.",
+      "Cone angles and steric/electronic ratings are approximate, especially for nonstandard ligands, and JackiePhos/PhPtBu-CPhos were treated as Buchwald-type biaryl phosphines despite mixed P-substitution.",
+      "Cone angles for very bulky biaryl phosphines are capped near 220°, and CgMe-PPh is uncertain because its cage/phosphinite-like structure makes steric and electronic estimates approximate."
+    ],
+    "created_at": "2026-11-02T13:18:33+00:00",
+    "confirmed_by": null
+  },
+  {
+    "variable": "base",
+    "values": {
+      "pka_conjugate_acid": {
+        "CsOAc": 12.3,
+        "CsOPiv": 12.8,
+        "KOAc": 12.3,
+        "KOPiv": 12.8
+      },
+      "strength": {
+        "CsOAc": 1.0,
+        "CsOPiv": 2.0,
+        "KOAc": 1.0,
+        "KOPiv": 2.0
+      },
+      "organic": {
+        "CsOAc": 0.0,
+        "CsOPiv": 0.0,
+        "KOAc": 0.0,
+        "KOPiv": 0.0
+      },
+      "cation_size": {
+        "CsOAc": 5.0,
+        "CsOPiv": 5.0,
+        "KOAc": 3.0,
+        "KOPiv": 3.0
+      },
+      "steric_bulk": {
+        "CsOAc": 1.0,
+        "CsOPiv": 3.0,
+        "KOAc": 1.0,
+        "KOPiv": 3.0
+      }
+    },
+    "spread": {
+      "pka_conjugate_acid": {
+        "CsOAc": 0.0,
+        "CsOPiv": 0.0,
+        "KOAc": 0.0,
+        "KOPiv": 0.0
+      },
+      "strength": {
+        "CsOAc": 0.0,
+        "CsOPiv": 1.0,
+        "KOAc": 0.0,
+        "KOPiv": 1.0
+      },
+      "organic": {
+        "CsOAc": 0.0,
+        "CsOPiv": 0.0,
+        "KOAc": 0.0,
+        "KOPiv": 0.0
+      },
+      "cation_size": {
+        "CsOAc": 0.0,
+        "CsOPiv": 0.0,
+        "KOAc": 0.0,
+        "KOPiv": 0.0
+      },
+      "steric_bulk": {
+        "CsOAc": 0.0,
+        "CsOPiv": 1.0,
+        "KOAc": 0.0,
+        "KOPiv": 1.0
+      }
+    },
+    "spec": [
+      {
+        "name": "pka_conjugate_acid",
+        "lower": 0,
+        "upper": 40,
+        "meaning": "pKa of the conjugate acid in DMSO (estimate)"
+      },
+      {
+        "name": "strength",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "1 weak (acetate) to 5 very strong (alkoxide, phosphazene)"
+      },
+      {
+        "name": "organic",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if an organic (soluble, non-metal) base, else 0"
+      },
+      {
+        "name": "cation_size",
+        "lower": 0,
+        "upper": 5,
+        "meaning": "0 none/organic, 1 Li, 2 Na, 3 K, 4 Rb, 5 Cs"
+      },
+      {
+        "name": "steric_bulk",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "1 small to 5 very hindered"
+      }
+    ],
+    "model": "qwen3.8-flash-next",
+    "n_samples": 3,
+    "issues": [],
+    "notes": [
+      "pKa values are approximate DMSO estimates for acetic/pivalic acid; pivalate is treated as slightly stronger and bulkier than acetate.",
+      "pKa values are approximate DMSO estimates for acetic/pivalic acid, and pivalate strength/bulk assignments are judgment calls.",
+      "Pivalate pKa and strength are approximate; it is treated as a weak carboxylate base with moderate steric bulk."
+    ],
+    "created_at": "2026-11-02T13:22:42+00:00",
+    "confirmed_by": null
+  },
+  {
+    "variable": "solvent",
+    "values": {
+      "dielectric_constant": {
+        "DMAc": 37.8,
+        "butyl acetate": 6.0,
+        "butyronitrile": 20.3,
+        "p-xylene": 2.3
+      },
+      "boiling_point_c": {
+        "DMAc": 165.0,
+        "butyl acetate": 126.0,
+        "butyronitrile": 118.0,
+        "p-xylene": 138.0
+      },
+      "protic": {
+        "DMAc": 0.0,
+        "butyl acetate": 0.0,
+        "butyronitrile": 0.0,
+        "p-xylene": 0.0
+      },
+      "coordinating": {
+        "DMAc": 4.0,
+        "butyl acetate": 2.0,
+        "butyronitrile": 4.0,
+        "p-xylene": 1.0
+      },
+      "water_miscible": {
+        "DMAc": 1.0,
+        "butyl acetate": 0.0,
+        "butyronitrile": 0.0,
+        "p-xylene": 0.0
+      }
+    },
+    "spread": {
+      "dielectric_constant": {
+        "DMAc": 0.0,
+        "butyl acetate": 0.0,
+        "butyronitrile": 16.0,
+        "p-xylene": 0.0
+      },
+      "boiling_point_c": {
+        "DMAc": 0.0,
+        "butyl acetate": 0.0,
+        "butyronitrile": 0.0,
+        "p-xylene": 0.0
+      },
+      "protic": {
+        "DMAc": 0.0,
+        "butyl acetate": 0.0,
+        "butyronitrile": 0.0,
+        "p-xylene": 0.0
+      },
+      "coordinating": {
+        "DMAc": 0.0,
+        "butyl acetate": 0.0,
+        "butyronitrile": 1.0,
+        "p-xylene": 0.0
+      },
+      "water_miscible": {
+        "DMAc": 0.0,
+        "butyl acetate": 0.0,
+        "butyronitrile": 0.0,
+        "p-xylene": 0.0
+      }
+    },
+    "spec": [
+      {
+        "name": "dielectric_constant",
+        "lower": 1,
+        "upper": 80,
+        "meaning": "relative permittivity at 25 C"
+      },
+      {
+        "name": "boiling_point_c",
+        "lower": 30,
+        "upper": 250,
+        "meaning": "boiling point in C"
+      },
+      {
+        "name": "protic",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if protic (has O-H or N-H), else 0"
+      },
+      {
+        "name": "coordinating",
+        "lower": 1,
+        "upper": 5,
+        "meaning": "1 non-coordinating (toluene) to 5 strongly coordinating to Pd (DMSO, MeCN)"
+      },
+      {
+        "name": "water_miscible",
+        "lower": 0,
+        "upper": 1,
+        "meaning": "1 if fully miscible with water, else 0"
+      }
+    ],
+    "model": "qwen3.8-flash-next",
+    "n_samples": 3,
+    "issues": [],
+    "notes": [
+      "Coordinating values are qualitative estimates for Pd, with amides and nitriles treated as moderately to strongly coordinating.",
+      "Coordinating strengths are qualitative Pd-ligand estimates, especially for nitriles and esters.",
+      "The provided butyronitrile SMILES appears to correspond to valeronitrile, but estimates were made for butyronitrile as named."
+    ],
+    "created_at": "2026-11-02T13:24:25+00:00",
+    "confirmed_by": null
+  }
+]
