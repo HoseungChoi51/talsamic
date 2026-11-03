@@ -61,6 +61,8 @@ def main(argv: list[str] | None = None) -> None:
     print(f"\n== 다음 실험 ({a.risk}, {settings.resolved_split()} = 최적화/학습/기준) ==")
     for s in batch.suggestions:
         print(f"{s.run:>2}. [{s.purpose}] {s.reason}")
+    for n in batch.notes:
+        print(f"참고: {n}")
     path = save_batch(batch, a.out)
     print(f"\n저장: {path}")
 

@@ -18,7 +18,7 @@ from typing import Any
 import pandas as pd
 
 from .analysis import Finding, discover
-from .calibration import fit_calibrated
+from .calibration import DriftShift, fit_calibrated
 from .cleaning import flag_suspect_values
 from .models import DEFAULT_MODEL, license_note, model_factory
 from .novelty import guarded
@@ -30,9 +30,10 @@ from .whatif import predict_recipe, slider_curves
 
 class Engine:
     def __init__(self, data: pd.DataFrame, schema: Schema, model: str = DEFAULT_MODEL,
-                 context: dict[str, Any] | None = None, **model_kw):
+                 context: dict[str, Any] | None = None, drift_correction: bool = True, **model_kw):
         self.data = data.reset_index(drop=True)
         self.schema = schema
+        self.drift_correction = drift_correction
         # every prediction flags recipes with a value the past runs never used (novelty.py)
         self.factory = guarded(model_factory(schema, model, **model_kw), schema)
         self.context = context if context is not None else self._latest_context()
@@ -59,7 +60,7 @@ class Engine:
 
     @cached_property
     def _fitted(self):
-        return fit_calibrated(self.factory, self.data, self.schema)
+        return fit_calibrated(self.factory, self.data, self.schema, drift_correction=self.drift_correction)
 
     @property
     def model(self):
@@ -69,6 +70,11 @@ class Engine:
     def calibration_errors(self) -> pd.DataFrame:
         return self._fitted[1]
 
+    @property
+    def drift(self) -> DriftShift | None:
+        """The recent shift the predictions were moved by; ``drift.applied`` says whether it was."""
+        return self.model.drift
+
     @cached_property
     def _findings(self) -> list[Finding]:
         return discover(self.data, self.schema, self.factory, errors=self.calibration_errors)
@@ -77,13 +83,19 @@ class Engine:
         return [f for f in self._findings if include_weak or f.show]
 
     def predict(self, recipe: dict[str, Any]) -> dict:
-        return predict_recipe(self.model, recipe, self.context)
+        out = predict_recipe(self.model, recipe, self.context)
+        if self.model.shift:
+            out["drift_shift_pp"] = round(self.model.shift, 1)  # the UI can show self.drift.note
+        return out
 
     def slider_curves(self, recipe: dict[str, Any]) -> dict[str, pd.DataFrame]:
         return slider_curves(self.model, self.data, self.schema, recipe, self.context)
 
     def suggest(self, settings: BatchSettings | None = None) -> Batch:
-        return suggest_batch(self.model, self.data, self.schema, settings, self.context)
+        batch = suggest_batch(self.model, self.data, self.schema, settings, self.context)
+        if self.drift is not None and self.drift.note:
+            batch.notes.append(self.drift.note)
+        return batch
 
     def suspect_values(self) -> pd.DataFrame:
         return flag_suspect_values(self.data, self.schema)

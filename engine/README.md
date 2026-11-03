@@ -90,6 +90,22 @@ with an out-of-fold error floor.
 later blocks (rolling origin). If the 80% ranges cover less than 80% of those runs,
 every range is widened by the same factor. Ranges are never narrowed.
 
+**Drift correction** (`calibration.py`). When the plant shifts (fouling, a new raw
+material), a model learns the new level only near the recipes run recently, so other
+recipes are still predicted at the old level. The final model checks the last two weeks:
+a model fitted only on earlier runs predicts them, and if they sit clearly off (at least
+0.7%p and two standard errors), that shift is taken out of the recent yields for fitting
+and added to every prediction, and its uncertainty is added to the range.
+`Engine.drift` holds the measurement, `Engine.predict` adds `drift_shift_pp`, and the
+batch notes get a sentence (최근 2주 실험이 … 모든 예상 수율을 2.1%p 낮췄다.).
+`Engine(..., drift_correction=False)` turns it off. The 발견 drift finding is unchanged.
+
+On the fake plant (`python -m yieldengine.benchmarks.drift`, GP, 5 seeds), older recipes
+rerun today go from 0.74%p too high to 0.06%p, and their 80% ranges from 77% to 87%
+coverage. Without drift the correction never switched on. Suggested batches still come
+in about 1.1%p below prediction even with no drift: the optimize runs are picked where the
+model is most optimistic (the optimizer's curse), which this correction does not address.
+
 **New-chemical guard** (`novelty.py`). A model learns what a ligand, base or catalyst
 does only from runs that used it, so a recipe with a value the past runs never used is
 a guess. In the benchmarks the foundation models were overconfident there: with
